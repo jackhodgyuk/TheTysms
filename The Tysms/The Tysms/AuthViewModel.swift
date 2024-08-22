@@ -8,6 +8,7 @@ class AuthViewModel: ObservableObject {
         let id: String
         let email: String
         var role: String
+        var name: String
     }
 
     @Published var currentUser: FirebaseAuth.User?
@@ -119,7 +120,8 @@ class AuthViewModel: ObservableObject {
                       let role = document.data()["role"] as? String else {
                     return nil
                 }
-                return User(id: document.documentID, email: email, role: role)
+                let name = document.data()["name"] as? String ?? ""
+                return User(id: document.documentID, email: email, role: role, name: name)
             }
         }
     }
@@ -145,7 +147,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    func createUser(email: String, role: String, completion: @escaping (Bool) -> Void) {
+    func createUser(email: String, name: String, role: String, completion: @escaping (Bool) -> Void) {
         let defaultPassword = "thetysms"
         
         Auth.auth().createUser(withEmail: email, password: defaultPassword) { [weak self] authResult, error in
@@ -163,6 +165,7 @@ class AuthViewModel: ObservableObject {
             
             self?.db.collection("userRoles").document(userId).setData([
                 "email": email,
+                "name": name,
                 "role": role
             ]) { error in
                 if let error = error {
@@ -189,6 +192,19 @@ class AuthViewModel: ObservableObject {
                 completion(false)
             } else {
                 print("Password changed successfully")
+                completion(true)
+            }
+        }
+    }
+    
+    func updateUserName(userId: String, name: String, completion: @escaping (Bool) -> Void) {
+        db.collection("userRoles").document(userId).updateData(["name": name]) { error in
+            if let error = error {
+                print("Error updating user name: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("User name updated successfully")
+                self.fetchAllUsers()
                 completion(true)
             }
         }

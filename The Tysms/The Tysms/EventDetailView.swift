@@ -3,7 +3,10 @@ import SwiftUI
 struct EventDetailView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @ObservedObject var eventViewModel: EventViewModel
+    @Environment(\.presentationMode) var presentationMode
     let event: Event
+    
+    @State private var showingDeleteAlert = false
     
     var body: some View {
         ScrollView {
@@ -21,11 +24,37 @@ struct EventDetailView: View {
                 
                 if authViewModel.isManager() || authViewModel.isAdmin() {
                     ResponseList(event: event)
+                    
+                    Button(action: { showingDeleteAlert = true }) {
+                        Text("Delete Event")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.red)
+                            .cornerRadius(8)
+                    }
+                    .padding(.top)
                 }
             }
             .padding()
         }
         .navigationTitle("Event Details")
+        .alert(isPresented: $showingDeleteAlert) {
+            Alert(
+                title: Text("Delete Event"),
+                message: Text("Are you sure you want to delete this event?"),
+                primaryButton: .destructive(Text("Delete")) {
+                    deleteEvent()
+                },
+                secondaryButton: .cancel()
+            )
+        }
+    }
+    
+    private func deleteEvent() {
+        if let eventId = event.id {
+            eventViewModel.deleteEvent(eventId: eventId)
+            presentationMode.wrappedValue.dismiss()
+        }
     }
 }
 
@@ -42,10 +71,12 @@ struct ResponseButtons: View {
                 .buttonStyle(CustomResponseButtonStyle(color: .yellow, isSelected: isSelected("maybe")))
             Button("No") { updateResponse("no") }
                 .buttonStyle(CustomResponseButtonStyle(color: .red, isSelected: isSelected("no")))
+            Button("Clear") { updateResponse(nil) }
+                .buttonStyle(CustomResponseButtonStyle(color: .gray, isSelected: false))
         }
     }
     
-    func updateResponse(_ response: String) {
+    func updateResponse(_ response: String?) {
         guard let userId = authViewModel.currentUser?.uid, let eventId = event.id else { return }
         eventViewModel.updateEventResponse(eventId: eventId, userId: userId, response: response)
     }
@@ -67,7 +98,7 @@ struct ResponseList: View {
                 .padding(.top)
             ForEach(Array(event.responses), id: \.key) { userId, response in
                 HStack {
-                    Text(authViewModel.allUsers.first(where: { $0.id == userId })?.email ?? userId)
+                    Text(getUserName(for: userId))
                     Spacer()
                     Circle()
                         .fill(colorForResponse(response))
@@ -75,6 +106,13 @@ struct ResponseList: View {
                 }
             }
         }
+    }
+    
+    func getUserName(for userId: String) -> String {
+        if let user = authViewModel.allUsers.first(where: { $0.id == userId }) {
+            return user.name.isEmpty ? user.email : user.name
+        }
+        return "Unknown User"
     }
     
     func colorForResponse(_ response: String) -> Color {
@@ -106,7 +144,7 @@ struct CustomResponseButtonStyle: ButtonStyle {
 
 struct EventDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        EventDetailView(eventViewModel: EventViewModel(), event: Event(title: "Sample Event", date: Date(), location: "Sample Location", description: "Sample Description"))
+        EventDetailView(eventViewModel: EventViewModel(), event: Event(id: "1", title: "Sample Event", date: Date(), location: "Sample Location", description: "Sample Description", responses: [:]))
             .environmentObject(AuthViewModel())
     }
 }

@@ -6,6 +6,7 @@ struct AdminView: View {
     @State private var showingRoleActionSheet = false
     @State private var showingResetPasswordAlert = false
     @State private var showingCreateUserSheet = false
+    @State private var showUpdateNameView = false
     
     var body: some View {
         NavigationView {
@@ -16,10 +17,16 @@ struct AdminView: View {
                             .font(.headline)
                         Text("Role: \(user.role)")
                             .font(.subheadline)
+                        Text("Name: \(user.name.isEmpty ? "Not set" : user.name)")
+                            .font(.subheadline)
                     }
                     .onTapGesture {
                         selectedUser = user
                         showingRoleActionSheet = true
+                    }
+                    Button("Update Name") {
+                        showUpdateNameView = true
+                        selectedUser = user
                     }
                 }
             }
@@ -59,6 +66,11 @@ struct AdminView: View {
             }
             .sheet(isPresented: $showingCreateUserSheet) {
                 CreateUserView()
+            }
+            .sheet(isPresented: $showUpdateNameView) {
+                if let user = selectedUser {
+                    UpdateUserNameView(userId: user.id, currentEmail: user.email)
+                }
             }
         }
     }

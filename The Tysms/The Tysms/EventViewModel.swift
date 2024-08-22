@@ -1,51 +1,143 @@
-//
-//  EventViewModel.swift
-//  The Tysms
-//
-//  Created by Jack Hodgy on 22/08/2024.
-//
+import SwiftUI
 
-
-import Foundation
-import Firebase
-import FirebaseFirestore
-
-class EventViewModel: ObservableObject {
-    @Published var events: [Event] = []
-    private var db = Firestore.firestore()
+struct EventDetailView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @ObservedObject var eventViewModel: EventViewModel
+    @Environment(\.presentationMode) var presentationMode
+    let event: Event
     
-    init() {
-        fetchEvents()
+    @State private var showingDeleteAlert = false
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(event.title)
+                    .font(.title)
+                Text(event.date, style: .date)
+                    .font(.subheadline)
+                Text(event.location)
+                    .font(.subheadline)
+                Text(event.description)
+                    .padding(.top)
+                
+                ResponseButtons(event: event, eventViewModel: eventViewModel)
+                
+                if authViewModel.isManager() || authViewModel.isAdmin() {
+                    ResponseList(eventViewModel: eventViewModel, event: event)
+                    
+                    Button(action: { showingDeleteAlert = true }) {
+                        Text("Delete Event")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.red)
+                            .cornerRadius(8)
+                    }
+                    .padding(.top)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("Event Details")
+        .alert(isPresented: $showingDeleteAlert) {
+            Alert(
+                title: Text("Delete Event"),
+                message: Text("Are you sure you want to delete this event?"),
+                primaryButton: .destructive(Text("Delete")) {
+                    deleteEvent()
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
     
-    func fetchEvents() {
-        db.collection("events").order(by: "date").addSnapshotListener { (querySnapshot, error) in
-            guard let documents = querySnapshot?.documents else {
-                print("No documents")
-                return
-            }
-            
-            self.events = documents.compactMap { queryDocumentSnapshot -> Event? in
-                return try? queryDocumentSnapshot.data(as: Event.self)
+    private func deleteEvent() {
+        if let eventId = event.id {
+            eventViewModel.deleteEvent(eventId: eventId)
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
+
+struct ResponseButtons: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
+    let event: Event
+    @ObservedObject var eventViewModel: EventViewModel
+    
+    var body: some View {
+        HStack {
+            Button("Yes") { updateResponse("yes") }
+                .buttonStyle(CustomResponseButtonStyle(color: .green, isSelected: isSelected("yes")))
+            Button("Maybe") { updateResponse("maybe") }
+                .buttonStyle(CustomResponseButtonStyle(color: .yellow, isSelected: isSelected("maybe")))
+            Button("No") { updateResponse("no") }
+                .buttonStyle(CustomResponseButtonStyle(color: .red, isSelected: isSelected("no")))
+            Button("Clear") { updateResponse(nil) }
+                .buttonStyle(CustomResponseButtonStyle(color: .gray, isSelected: false))
+        }
+    }
+    
+    func updateResponse(_ response: String?) {
+        guard let userId = authViewModel.currentUser?.uid, let eventId = event.id else { return }
+        eventViewModel.updateEventResponse(eventId: eventId, userId: userId, response: response)
+    }
+    
+    func isSelected(_ response: String) -> Bool {
+        guard let userId = authViewModel.currentUser?.uid else { return false }
+        return event.responses[userId] == response
+    }
+}
+
+struct ResponseList: View {
+    @ObservedObject var eventViewModel: EventViewModel
+    let event: Event
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Responses")
+                .font(.headline)
+                .padding(.top)
+            ForEach(Array(event.responses), id: \.key) { userId, response in
+                HStack {
+                    Text(eventViewModel.getUserName(for: userId))
+                    Spacer()
+                    Circle()
+                        .fill(colorForResponse(response))
+                        .frame(width: 20, height: 20)
+                }
             }
         }
     }
     
-    func addEvent(_ event: Event) {
-        do {
-            let _ = try db.collection("events").addDocument(from: event)
-        } catch {
-            print("Error adding event: \(error)")
+    func colorForResponse(_ response: String) -> Color {
+        switch response {
+        case "yes":
+            return .green
+        case "maybe":
+            return .yellow
+        case "no":
+            return .red
+        default:
+            return .gray
         }
     }
+}
+
+struct CustomResponseButtonStyle: ButtonStyle {
+    let color: Color
+    let isSelected: Bool
     
-    func updateEventResponse(eventId: String, userId: String, response: String) {
-        db.collection("events").document(eventId).updateData([
-            "responses.\(userId)": response
-        ]) { error in
-            if let error = error {
-                print("Error updating event response: \(error)")
-            }
-        }
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding()
+            .background(isSelected ? color : color.opacity(0.2))
+            .foregroundColor(isSelected ? .white : .primary)
+            .clipShape(Capsule())
+    }
+}
+
+struct EventDetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        EventDetailView(eventViewModel: EventViewModel(), event: Event(id: "1", title: "Sample Event", date: Date(), location: "Sample Location", description: "Sample Description", responses: [:]))
+            .environmentObject(AuthViewModel())
     }
 }
