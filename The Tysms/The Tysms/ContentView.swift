@@ -7,7 +7,7 @@ struct ContentView: View {
         Group {
             if authViewModel.isLoading {
                 ProgressView("Loading...")
-            } else if authViewModel.user == nil {
+            } else if authViewModel.currentUser == nil {
                 LoginView()
             } else {
                 MainTabView()

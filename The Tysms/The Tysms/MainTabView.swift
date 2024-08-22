@@ -20,7 +20,7 @@ struct MainTabView: View {
                     Label("Finances", systemImage: "dollarsign.circle")
                 }
             
-            if authViewModel.isManager() {
+            if authViewModel.isManager() || authViewModel.isAdmin() {
                 ManagerView()
                     .tabItem {
                         Label("Manage", systemImage: "person.2")
@@ -33,12 +33,24 @@ struct MainTabView: View {
                         Label("Admin", systemImage: "gear")
                     }
             }
+            
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape")
+                }
         }
         .onAppear {
             print("MainTabView appeared")
-            print("User role: \(authViewModel.userRole?.role ?? "nil")")
+            print("User role: \(authViewModel.currentUserRole ?? "nil")")
             print("Is admin: \(authViewModel.isAdmin())")
             print("Is manager: \(authViewModel.isManager())")
         }
+    }
+}
+
+struct MainTabView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainTabView()
+            .environmentObject(AuthViewModel())
     }
 }

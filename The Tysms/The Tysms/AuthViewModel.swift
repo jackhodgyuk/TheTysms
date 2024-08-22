@@ -4,16 +4,16 @@ import FirebaseAuth
 import FirebaseFirestore
 
 class AuthViewModel: ObservableObject {
-    struct UserRole: Identifiable, Codable {
-        @DocumentID var id: String?
-        var userid: String
-        var email: String
+    struct User: Identifiable {
+        let id: String
+        let email: String
         var role: String
     }
 
-    @Published var user: FirebaseAuth.User?
-    @Published var userRole: UserRole?
+    @Published var currentUser: FirebaseAuth.User?
+    @Published var currentUserRole: String?
     @Published var isLoading = true
+    @Published var allUsers: [User] = []
     
     private var db = Firestore.firestore()
     
@@ -21,11 +21,11 @@ class AuthViewModel: ObservableObject {
         print("AuthViewModel initialized")
         Auth.auth().addStateDidChangeListener { [weak self] _, user in
             print("Auth state changed. User: \(user?.uid ?? "nil")")
-            self?.user = user
+            self?.currentUser = user
             if let user = user {
                 self?.fetchUserRole(for: user.uid)
             } else {
-                self?.userRole = nil
+                self?.currentUserRole = nil
                 self?.isLoading = false
             }
         }
@@ -49,8 +49,8 @@ class AuthViewModel: ObservableObject {
         print("Attempting to sign out")
         do {
             try Auth.auth().signOut()
-            self.user = nil
-            self.userRole = nil
+            self.currentUser = nil
+            self.currentUserRole = nil
             print("Sign out successful")
         } catch {
             print("Error signing out: \(error.localizedDescription)")
@@ -77,35 +77,11 @@ class AuthViewModel: ObservableObject {
                 return
             }
             
-            if let document = document, document.exists {
-                do {
-                    let userRole = try document.data(as: UserRole.self)
-                    DispatchQueue.main.async {
-                        self?.userRole = userRole
-                        self?.isLoading = false
-                        print("User role fetched successfully: \(userRole.role)")
-                    }
-                } catch {
-                    print("Error decoding user role: \(error.localizedDescription)")
-                    if let data = document.data() {
-                        print("Document data: \(data)")
-                        // Manually create UserRole from the document data
-                        if let email = data["email"] as? String,
-                           let role = data["role"] as? String,
-                           let userid = data["userid"] as? String {
-                            let userRole = UserRole(id: document.documentID, userid: userid, email: email, role: role)
-                            DispatchQueue.main.async {
-                                self?.userRole = userRole
-                                self?.isLoading = false
-                                print("User role manually created: \(userRole.role)")
-                            }
-                        } else {
-                            print("Failed to manually create UserRole from document data")
-                            self?.isLoading = false
-                        }
-                    } else {
-                        self?.isLoading = false
-                    }
+            if let document = document, document.exists, let role = document.data()?["role"] as? String {
+                DispatchQueue.main.async {
+                    self?.currentUserRole = role
+                    self?.isLoading = false
+                    print("User role fetched successfully: \(role)")
                 }
             } else {
                 print("User role document does not exist for userId: \(userId)")
@@ -115,71 +91,105 @@ class AuthViewModel: ObservableObject {
     }
     
     func isAdmin() -> Bool {
-        let isAdmin = userRole?.role.lowercased() == "admin"
-        print("Checking if user is admin: \(isAdmin) (userRole: \(String(describing: userRole)))")
-        return isAdmin
+        return currentUserRole?.lowercased() == "admin"
     }
     
     func isManager() -> Bool {
-        let isManager = userRole?.role.lowercased() == "manager" || isAdmin()
-        print("Checking if user is manager: \(isManager) (userRole: \(String(describing: userRole)))")
-        return isManager
+        return currentUserRole?.lowercased() == "manager" || isAdmin()
     }
     
     func isBandMember() -> Bool {
-        let isBandMember = userRole?.role.lowercased() == "bandmember" || isManager()
-        print("Checking if user is band member: \(isBandMember)")
-        return isBandMember
+        return currentUserRole?.lowercased() == "bandmember" || isManager()
     }
     
-    func assignRole(to email: String, role: String) {
-        print("Attempting to assign role \(role) to email: \(email)")
-        guard isAdmin() else {
-            print("Only admins can assign roles")
+    func fetchAllUsers() {
+        db.collection("userRoles").getDocuments { [weak self] querySnapshot, error in
+            if let error = error {
+                print("Error fetching users: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = querySnapshot?.documents else {
+                print("No users found")
+                return
+            }
+            
+            self?.allUsers = documents.compactMap { document in
+                guard let email = document.data()["email"] as? String,
+                      let role = document.data()["role"] as? String else {
+                    return nil
+                }
+                return User(id: document.documentID, email: email, role: role)
+            }
+        }
+    }
+    
+    func updateUserRole(userId: String, newRole: String) {
+        db.collection("userRoles").document(userId).setData(["role": newRole], merge: true) { error in
+            if let error = error {
+                print("Error updating user role: \(error.localizedDescription)")
+            } else {
+                print("User role updated successfully")
+                self.fetchAllUsers()
+            }
+        }
+    }
+    
+    func resetUserPassword(email: String) {
+        Auth.auth().sendPasswordReset(withEmail: email) { error in
+            if let error = error {
+                print("Error resetting password: \(error.localizedDescription)")
+            } else {
+                print("Password reset email sent successfully")
+            }
+        }
+    }
+    
+    func createUser(email: String, role: String, completion: @escaping (Bool) -> Void) {
+        let defaultPassword = "thetysms"
+        
+        Auth.auth().createUser(withEmail: email, password: defaultPassword) { [weak self] authResult, error in
+            if let error = error {
+                print("Error creating user: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+            
+            guard let userId = authResult?.user.uid else {
+                print("Failed to get user ID after creation")
+                completion(false)
+                return
+            }
+            
+            self?.db.collection("userRoles").document(userId).setData([
+                "email": email,
+                "role": role
+            ]) { error in
+                if let error = error {
+                    print("Error saving user role: \(error.localizedDescription)")
+                    completion(false)
+                } else {
+                    print("User created and role saved successfully")
+                    self?.fetchAllUsers()
+                    completion(true)
+                }
+            }
+        }
+    }
+    
+    func changePassword(newPassword: String, completion: @escaping (Bool) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(false)
             return
         }
         
-        Auth.auth().fetchSignInMethods(forEmail: email) { [weak self] methods, error in
+        user.updatePassword(to: newPassword) { error in
             if let error = error {
-                print("Error fetching sign-in methods: \(error.localizedDescription)")
-                return
-            }
-            
-            if methods?.isEmpty ?? true {
-                print("User does not exist")
-                return
-            }
-            
-            self?.db.collection("userRoles").whereField("email", isEqualTo: email).getDocuments { querySnapshot, error in
-                if let error = error {
-                    print("Error fetching user role: \(error.localizedDescription)")
-                    return
-                }
-                
-                if let document = querySnapshot?.documents.first {
-                    // Update existing role
-                    document.reference.updateData(["role": role]) { error in
-                        if let error = error {
-                            print("Error updating user role: \(error.localizedDescription)")
-                        } else {
-                            print("User role updated successfully")
-                        }
-                    }
-                } else {
-                    // Create new role
-                    let newRole = UserRole(userid: "", email: email, role: role)
-                    do {
-                        try self?.db.collection("userRoles").addDocument(from: newRole) { error in
-                            if let error = error {
-                                print("Error creating user role: \(error.localizedDescription)")
-                            } else {
-                                print("New user role created successfully")
-                            }
-                        }
-                    } catch {
-                        print("Error creating user role: \(error.localizedDescription)")
-                    }
-                }
+                print("Error changing password: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("Password changed successfully")
+                completion(true)
             }
         }
     }
