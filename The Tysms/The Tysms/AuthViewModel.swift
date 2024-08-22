@@ -3,14 +3,14 @@ import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 
-struct UserRole: Identifiable, Codable {
-    @DocumentID var id: String?
-    var userid: String
-    var email: String
-    var role: String
-}
-
 class AuthViewModel: ObservableObject {
+    struct UserRole: Identifiable, Codable {
+        @DocumentID var id: String?
+        var userId: String
+        var email: String
+        var role: String
+    }
+
     @Published var user: FirebaseAuth.User?
     @Published var userRole: UserRole?
     @Published var isLoading = true
@@ -152,7 +152,7 @@ class AuthViewModel: ObservableObject {
                     }
                 } else {
                     // Create new role
-                    let newRole = UserRole(userid: "", email: email, role: role)
+                    let newRole = UserRole(userId: "", email: email, role: role)
                     do {
                         try self?.db.collection("userRoles").addDocument(from: newRole) { error in
                             if let error = error {

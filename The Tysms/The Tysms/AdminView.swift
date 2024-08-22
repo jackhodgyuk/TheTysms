@@ -3,7 +3,9 @@ import SwiftUI
 struct AdminView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var email = ""
-    @State private var selectedRole: UserType = .bandMember
+    @State private var selectedRole = "bandmember"
+    
+    let roleOptions = ["admin", "manager", "bandmember"]
     
     var body: some View {
         Form {
@@ -13,8 +15,9 @@ struct AdminView: View {
                     .keyboardType(.emailAddress)
                 
                 Picker("Role", selection: $selectedRole) {
-                    Text("Band Member").tag(UserType.bandMember)
-                    Text("Manager").tag(UserType.manager)
+                    ForEach(roleOptions, id: \.self) { role in
+                        Text(role.capitalized).tag(role)
+                    }
                 }
                 
                 Button("Assign Role") {
@@ -24,5 +27,12 @@ struct AdminView: View {
             }
         }
         .navigationTitle("Admin Panel")
+    }
+}
+
+struct AdminView_Previews: PreviewProvider {
+    static var previews: some View {
+        AdminView()
+            .environmentObject(AuthViewModel())
     }
 }
