@@ -10,6 +10,7 @@
 		80C435802C77DD980080E7FD /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 80C4357F2C77DD980080E7FD /* FirebaseDatabase */; };
 		80C435822C77DD980080E7FD /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 80C435812C77DD980080E7FD /* FirebaseFirestore */; };
 		80C435842C77DD980080E7FD /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 80C435832C77DD980080E7FD /* FirebaseMessaging */; };
+		80C4358E2C77E1090080E7FD /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 80C4358D2C77E1090080E7FD /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 				80C435842C77DD980080E7FD /* FirebaseMessaging in Frameworks */,
 				80C435802C77DD980080E7FD /* FirebaseDatabase in Frameworks */,
 				80C435822C77DD980080E7FD /* FirebaseFirestore in Frameworks */,
+				80C4358E2C77E1090080E7FD /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +114,7 @@
 				80C4357F2C77DD980080E7FD /* FirebaseDatabase */,
 				80C435812C77DD980080E7FD /* FirebaseFirestore */,
 				80C435832C77DD980080E7FD /* FirebaseMessaging */,
+				80C4358D2C77E1090080E7FD /* FirebaseAuth */,
 			);
 			productName = "The Tysms";
 			productReference = 80C4354F2C77DD3E0080E7FD /* The Tysms.app */;
@@ -589,6 +592,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 80C4357E2C77DD980080E7FD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		80C4358D2C77E1090080E7FD /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80C4357E2C77DD980080E7FD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

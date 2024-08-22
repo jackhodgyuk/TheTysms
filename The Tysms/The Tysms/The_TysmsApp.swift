@@ -1,9 +1,8 @@
 import SwiftUI
 import Firebase
-import FirebaseFirestoreSwift
 
 @main
-struct TheTysmsApp: App {
+struct The_TysmsApp: App {
     @StateObject private var authViewModel = AuthViewModel()
     
     init() {
@@ -36,19 +35,6 @@ struct ContentView: View {
 
 struct SplashScreen: View {
     var body: some View {
-        VStack {
-            Image("TheTysmsLogo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 200, height: 200)
-            Text("The Tysms")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                // Transition to next screen
-            }
-        }
+        Text("Loading...")
     }
 }
