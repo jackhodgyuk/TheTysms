@@ -1,57 +1,62 @@
 import SwiftUI
 
 struct EventListView: View {
-    @StateObject private var viewModel = EventViewModel()
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @StateObject var eventViewModel = EventViewModel()
+    @State private var showingAddEvent = false
     
     var body: some View {
         NavigationView {
-            List(viewModel.events) { event in
-                NavigationLink(destination: EventDetailView(event: event)) {
-                    VStack(alignment: .leading) {
-                        Text(event.title)
-                            .font(.headline)
-                        Text(event.date, style: .date)
-                            .font(.subheadline)
+            List(eventViewModel.events) { event in
+                NavigationLink(destination: EventDetailView(eventViewModel: eventViewModel, event: event)) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(event.title)
+                                .font(.headline)
+                            Text(event.date, style: .date)
+                                .font(.subheadline)
+                        }
+                        Spacer()
+                        if let userId = authViewModel.currentUser?.uid,
+                           let response = event.responses[userId] {
+                            Circle()
+                                .fill(colorForResponse(response))
+                                .frame(width: 20, height: 20)
+                        }
                     }
                 }
             }
-            .navigationTitle("Upcoming Events")
-            .onAppear {
-                viewModel.fetchEvents()
+            .navigationTitle("Events")
+            .navigationBarItems(trailing: Group {
+                if authViewModel.isManager() || authViewModel.isAdmin() {
+                    Button(action: { showingAddEvent = true }) {
+                        Image(systemName: "plus")
+                    }
+                }
+            })
+            .sheet(isPresented: $showingAddEvent) {
+                AddEventView(eventViewModel: eventViewModel)
             }
+        }
+    }
+    
+    func colorForResponse(_ response: String) -> Color {
+        switch response {
+        case "yes":
+            return .green
+        case "maybe":
+            return .yellow
+        case "no":
+            return .red
+        default:
+            return .gray
         }
     }
 }
 
-struct EventDetailView: View {
-    @StateObject private var viewModel = EventViewModel()
-    let event: Event
-    @State private var attendanceStatus: Event.Attendee.AttendanceStatus = .maybe
-    @State private var attendanceNote: String = ""
-    
-    var body: some View {
-        Form {
-            Section(header: Text("Event Details")) {
-                Text(event.title)
-                Text(event.date, style: .date)
-                Text(event.type.rawValue.capitalized)
-            }
-            
-            Section(header: Text("Your Attendance")) {
-                Picker("Status", selection: $attendanceStatus) {
-                    Text("Yes").tag(Event.Attendee.AttendanceStatus.yes)
-                    Text("No").tag(Event.Attendee.AttendanceStatus.no)
-                    Text("Maybe").tag(Event.Attendee.AttendanceStatus.maybe)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                
-                TextField("Notes", text: $attendanceNote)
-            }
-            
-            Button("Update Attendance") {
-                viewModel.updateAttendance(for: event, status: attendanceStatus, note: attendanceNote)
-            }
-        }
-        .navigationTitle(event.title)
+struct EventListView_Previews: PreviewProvider {
+    static var previews: some View {
+        EventListView()
+            .environmentObject(AuthViewModel())
     }
 }
