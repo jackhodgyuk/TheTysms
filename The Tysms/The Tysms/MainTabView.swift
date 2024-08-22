@@ -26,13 +26,12 @@ struct MainTabView: View {
                         Label("Manage", systemImage: "person.2")
                     }
             }
-            
-            if authViewModel.isAdmin() {
-                AdminView()
-                    .tabItem {
-                        Label("Admin", systemImage: "gear")
-                    }
-            }
+        }
+        .onAppear {
+            print("MainTabView appeared")
+            print("User role: \(authViewModel.userRole?.role ?? "nil")")
+            print("Is admin: \(authViewModel.isAdmin())")
+            print("Is manager: \(authViewModel.isManager())")
         }
     }
 }

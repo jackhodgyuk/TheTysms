@@ -1,11 +1,3 @@
-//
-//  UserRole.swift
-//  The Tysms
-//
-//  Created by Jack Hodgy on 22/08/2024.
-//
-
-
 import Foundation
 import FirebaseFirestore
 

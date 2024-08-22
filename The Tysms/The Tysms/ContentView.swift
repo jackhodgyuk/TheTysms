@@ -6,7 +6,7 @@ struct ContentView: View {
     var body: some View {
         Group {
             if authViewModel.isLoading {
-                SplashScreen()
+                ProgressView("Loading...")
             } else if authViewModel.user == nil {
                 LoginView()
             } else {
@@ -16,8 +16,9 @@ struct ContentView: View {
     }
 }
 
-struct SplashScreen: View {
-    var body: some View {
-        Text("Loading...")
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environmentObject(AuthViewModel())
     }
 }
