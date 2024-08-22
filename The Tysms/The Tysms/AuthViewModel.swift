@@ -3,6 +3,13 @@ import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 
+struct UserRole: Identifiable, Codable {
+    @DocumentID var id: String?
+    var userid: String
+    var email: String
+    var role: String
+}
+
 class AuthViewModel: ObservableObject {
     @Published var user: FirebaseAuth.User?
     @Published var userRole: UserRole?
