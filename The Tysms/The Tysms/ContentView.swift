@@ -1,5 +1,4 @@
 import SwiftUI
-import Firebase
 
 struct ContentView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -14,5 +13,11 @@ struct ContentView: View {
                 MainTabView()
             }
         }
+    }
+}
+
+struct SplashScreen: View {
+    var body: some View {
+        Text("Loading...")
     }
 }

@@ -20,10 +20,17 @@ struct MainTabView: View {
                     Label("Finances", systemImage: "dollarsign.circle")
                 }
             
-            if authViewModel.isManager {
+            if authViewModel.isManager() {
                 ManagerView()
                     .tabItem {
                         Label("Manage", systemImage: "person.2")
+                    }
+            }
+            
+            if authViewModel.isAdmin() {
+                AdminView()
+                    .tabItem {
+                        Label("Admin", systemImage: "gear")
                     }
             }
         }

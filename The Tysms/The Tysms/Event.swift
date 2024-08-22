@@ -1,14 +1,7 @@
-//
-//  Event.swift
-//  The Tysms
-//
-//  Created by Jack Hodgy on 22/08/2024.
-//
-
-
-import Foundation
-import FirebaseFirestore
 import SwiftUI
+import Firebase
+import FirebaseFirestore
+import FirebaseAuth
 
 struct Event: Identifiable, Codable {
     @DocumentID var id: String?
@@ -49,7 +42,7 @@ class EventViewModel: ObservableObject {
     }
     
     func updateAttendance(for event: Event, status: Event.Attendee.AttendanceStatus, note: String?) {
-        guard let userId = Auth.auth().currentUser?.uid, let eventId = event.id else { return }
+        guard let userId = FirebaseAuth.Auth.auth().currentUser?.uid, let eventId = event.id else { return }
         
         let db = Firestore.firestore()
         db.collection("events").document(eventId).updateData([
@@ -57,61 +50,5 @@ class EventViewModel: ObservableObject {
                 ["userId": userId, "status": status.rawValue, "note": note ?? ""]
             ])
         ])
-    }
-}
-
-struct EventListView: View {
-    @StateObject private var viewModel = EventViewModel()
-    
-    var body: some View {
-        NavigationView {
-            List(viewModel.events) { event in
-                NavigationLink(destination: EventDetailView(event: event)) {
-                    VStack(alignment: .leading) {
-                        Text(event.title)
-                            .font(.headline)
-                        Text(event.date, style: .date)
-                            .font(.subheadline)
-                    }
-                }
-            }
-            .navigationTitle("Upcoming Events")
-            .onAppear {
-                viewModel.fetchEvents()
-            }
-        }
-    }
-}
-
-struct EventDetailView: View {
-    @StateObject private var viewModel = EventViewModel()
-    let event: Event
-    @State private var attendanceStatus: Event.Attendee.AttendanceStatus = .maybe
-    @State private var attendanceNote: String = ""
-    
-    var body: some View {
-        Form {
-            Section(header: Text("Event Details")) {
-                Text(event.title)
-                Text(event.date, style: .date)
-                Text(event.type.rawValue.capitalized)
-            }
-            
-            Section(header: Text("Your Attendance")) {
-                Picker("Status", selection: $attendanceStatus) {
-                    Text("Yes").tag(Event.Attendee.AttendanceStatus.yes)
-                    Text("No").tag(Event.Attendee.AttendanceStatus.no)
-                    Text("Maybe").tag(Event.Attendee.AttendanceStatus.maybe)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                
-                TextField("Notes", text: $attendanceNote)
-            }
-            
-            Button("Update Attendance") {
-                viewModel.updateAttendance(for: event, status: attendanceStatus, note: attendanceNote)
-            }
-        }
-        .navigationTitle(event.title)
     }
 }
