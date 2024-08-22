@@ -6,7 +6,7 @@ import FirebaseFirestore
 class AuthViewModel: ObservableObject {
     struct UserRole: Identifiable, Codable {
         @DocumentID var id: String?
-        var userId: String
+        var userid: String
         var email: String
         var role: String
     }
@@ -89,8 +89,23 @@ class AuthViewModel: ObservableObject {
                     print("Error decoding user role: \(error.localizedDescription)")
                     if let data = document.data() {
                         print("Document data: \(data)")
+                        // Manually create UserRole from the document data
+                        if let email = data["email"] as? String,
+                           let role = data["role"] as? String,
+                           let userid = data["userid"] as? String {
+                            let userRole = UserRole(id: document.documentID, userid: userid, email: email, role: role)
+                            DispatchQueue.main.async {
+                                self?.userRole = userRole
+                                self?.isLoading = false
+                                print("User role manually created: \(userRole.role)")
+                            }
+                        } else {
+                            print("Failed to manually create UserRole from document data")
+                            self?.isLoading = false
+                        }
+                    } else {
+                        self?.isLoading = false
                     }
-                    self?.isLoading = false
                 }
             } else {
                 print("User role document does not exist for userId: \(userId)")
@@ -101,13 +116,13 @@ class AuthViewModel: ObservableObject {
     
     func isAdmin() -> Bool {
         let isAdmin = userRole?.role.lowercased() == "admin"
-        print("Checking if user is admin: \(isAdmin)")
+        print("Checking if user is admin: \(isAdmin) (userRole: \(String(describing: userRole)))")
         return isAdmin
     }
     
     func isManager() -> Bool {
         let isManager = userRole?.role.lowercased() == "manager" || isAdmin()
-        print("Checking if user is manager: \(isManager)")
+        print("Checking if user is manager: \(isManager) (userRole: \(String(describing: userRole)))")
         return isManager
     }
     
@@ -152,7 +167,7 @@ class AuthViewModel: ObservableObject {
                     }
                 } else {
                     // Create new role
-                    let newRole = UserRole(userId: "", email: email, role: role)
+                    let newRole = UserRole(userid: "", email: email, role: role)
                     do {
                         try self?.db.collection("userRoles").addDocument(from: newRole) { error in
                             if let error = error {
