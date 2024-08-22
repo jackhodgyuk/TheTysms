@@ -1,0 +1,596 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		80C435802C77DD980080E7FD /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 80C4357F2C77DD980080E7FD /* FirebaseDatabase */; };
+		80C435822C77DD980080E7FD /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 80C435812C77DD980080E7FD /* FirebaseFirestore */; };
+		80C435842C77DD980080E7FD /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 80C435832C77DD980080E7FD /* FirebaseMessaging */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		80C435622C77DD400080E7FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 80C435472C77DD3E0080E7FD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 80C4354E2C77DD3E0080E7FD;
+			remoteInfo = "The Tysms";
+		};
+		80C4356C2C77DD400080E7FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 80C435472C77DD3E0080E7FD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 80C4354E2C77DD3E0080E7FD;
+			remoteInfo = "The Tysms";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		80C4354F2C77DD3E0080E7FD /* The Tysms.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "The Tysms.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		80C435612C77DD400080E7FD /* The TysmsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "The TysmsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		80C4356B2C77DD400080E7FD /* The TysmsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "The TysmsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		80C435512C77DD3E0080E7FD /* The Tysms */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "The Tysms"; sourceTree = "<group>"; };
+		80C435642C77DD400080E7FD /* The TysmsTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "The TysmsTests"; sourceTree = "<group>"; };
+		80C4356E2C77DD400080E7FD /* The TysmsUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "The TysmsUITests"; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		80C4354C2C77DD3E0080E7FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				80C435842C77DD980080E7FD /* FirebaseMessaging in Frameworks */,
+				80C435802C77DD980080E7FD /* FirebaseDatabase in Frameworks */,
+				80C435822C77DD980080E7FD /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80C4355E2C77DD400080E7FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80C435682C77DD400080E7FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		80C435462C77DD3E0080E7FD = {
+			isa = PBXGroup;
+			children = (
+				80C435512C77DD3E0080E7FD /* The Tysms */,
+				80C435642C77DD400080E7FD /* The TysmsTests */,
+				80C4356E2C77DD400080E7FD /* The TysmsUITests */,
+				80C435502C77DD3E0080E7FD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		80C435502C77DD3E0080E7FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				80C4354F2C77DD3E0080E7FD /* The Tysms.app */,
+				80C435612C77DD400080E7FD /* The TysmsTests.xctest */,
+				80C4356B2C77DD400080E7FD /* The TysmsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		80C4354E2C77DD3E0080E7FD /* The Tysms */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80C435752C77DD400080E7FD /* Build configuration list for PBXNativeTarget "The Tysms" */;
+			buildPhases = (
+				80C4354B2C77DD3E0080E7FD /* Sources */,
+				80C4354C2C77DD3E0080E7FD /* Frameworks */,
+				80C4354D2C77DD3E0080E7FD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				80C435512C77DD3E0080E7FD /* The Tysms */,
+			);
+			name = "The Tysms";
+			packageProductDependencies = (
+				80C4357F2C77DD980080E7FD /* FirebaseDatabase */,
+				80C435812C77DD980080E7FD /* FirebaseFirestore */,
+				80C435832C77DD980080E7FD /* FirebaseMessaging */,
+			);
+			productName = "The Tysms";
+			productReference = 80C4354F2C77DD3E0080E7FD /* The Tysms.app */;
+			productType = "com.apple.product-type.application";
+		};
+		80C435602C77DD400080E7FD /* The TysmsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80C435782C77DD400080E7FD /* Build configuration list for PBXNativeTarget "The TysmsTests" */;
+			buildPhases = (
+				80C4355D2C77DD400080E7FD /* Sources */,
+				80C4355E2C77DD400080E7FD /* Frameworks */,
+				80C4355F2C77DD400080E7FD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				80C435632C77DD400080E7FD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				80C435642C77DD400080E7FD /* The TysmsTests */,
+			);
+			name = "The TysmsTests";
+			packageProductDependencies = (
+			);
+			productName = "The TysmsTests";
+			productReference = 80C435612C77DD400080E7FD /* The TysmsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		80C4356A2C77DD400080E7FD /* The TysmsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80C4357B2C77DD400080E7FD /* Build configuration list for PBXNativeTarget "The TysmsUITests" */;
+			buildPhases = (
+				80C435672C77DD400080E7FD /* Sources */,
+				80C435682C77DD400080E7FD /* Frameworks */,
+				80C435692C77DD400080E7FD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				80C4356D2C77DD400080E7FD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				80C4356E2C77DD400080E7FD /* The TysmsUITests */,
+			);
+			name = "The TysmsUITests";
+			packageProductDependencies = (
+			);
+			productName = "The TysmsUITests";
+			productReference = 80C4356B2C77DD400080E7FD /* The TysmsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		80C435472C77DD3E0080E7FD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					80C4354E2C77DD3E0080E7FD = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					80C435602C77DD400080E7FD = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 80C4354E2C77DD3E0080E7FD;
+					};
+					80C4356A2C77DD400080E7FD = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 80C4354E2C77DD3E0080E7FD;
+					};
+				};
+			};
+			buildConfigurationList = 80C4354A2C77DD3E0080E7FD /* Build configuration list for PBXProject "The Tysms" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 80C435462C77DD3E0080E7FD;
+			packageReferences = (
+				80C4357E2C77DD980080E7FD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			productRefGroup = 80C435502C77DD3E0080E7FD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				80C4354E2C77DD3E0080E7FD /* The Tysms */,
+				80C435602C77DD400080E7FD /* The TysmsTests */,
+				80C4356A2C77DD400080E7FD /* The TysmsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		80C4354D2C77DD3E0080E7FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80C4355F2C77DD400080E7FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80C435692C77DD400080E7FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		80C4354B2C77DD3E0080E7FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80C4355D2C77DD400080E7FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		80C435672C77DD400080E7FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		80C435632C77DD400080E7FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 80C4354E2C77DD3E0080E7FD /* The Tysms */;
+			targetProxy = 80C435622C77DD400080E7FD /* PBXContainerItemProxy */;
+		};
+		80C4356D2C77DD400080E7FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 80C4354E2C77DD3E0080E7FD /* The Tysms */;
+			targetProxy = 80C4356C2C77DD400080E7FD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		80C435732C77DD400080E7FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		80C435742C77DD400080E7FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		80C435762C77DD400080E7FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"The Tysms/Preview Content\"";
+				DEVELOPMENT_TEAM = G383S45TNU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Admin.The-Tysms";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		80C435772C77DD400080E7FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"The Tysms/Preview Content\"";
+				DEVELOPMENT_TEAM = G383S45TNU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Admin.The-Tysms";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		80C435792C77DD400080E7FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = G383S45TNU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Admin.The-TysmsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/The Tysms.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/The Tysms";
+			};
+			name = Debug;
+		};
+		80C4357A2C77DD400080E7FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = G383S45TNU;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Admin.The-TysmsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/The Tysms.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/The Tysms";
+			};
+			name = Release;
+		};
+		80C4357C2C77DD400080E7FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = G383S45TNU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Admin.The-TysmsUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "The Tysms";
+			};
+			name = Debug;
+		};
+		80C4357D2C77DD400080E7FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = G383S45TNU;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Admin.The-TysmsUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "The Tysms";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		80C4354A2C77DD3E0080E7FD /* Build configuration list for PBXProject "The Tysms" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80C435732C77DD400080E7FD /* Debug */,
+				80C435742C77DD400080E7FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80C435752C77DD400080E7FD /* Build configuration list for PBXNativeTarget "The Tysms" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80C435762C77DD400080E7FD /* Debug */,
+				80C435772C77DD400080E7FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80C435782C77DD400080E7FD /* Build configuration list for PBXNativeTarget "The TysmsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80C435792C77DD400080E7FD /* Debug */,
+				80C4357A2C77DD400080E7FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80C4357B2C77DD400080E7FD /* Build configuration list for PBXNativeTarget "The TysmsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80C4357C2C77DD400080E7FD /* Debug */,
+				80C4357D2C77DD400080E7FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		80C4357E2C77DD980080E7FD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		80C4357F2C77DD980080E7FD /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80C4357E2C77DD980080E7FD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		80C435812C77DD980080E7FD /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80C4357E2C77DD980080E7FD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		80C435832C77DD980080E7FD /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80C4357E2C77DD980080E7FD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 80C435472C77DD3E0080E7FD /* Project object */;
+}
