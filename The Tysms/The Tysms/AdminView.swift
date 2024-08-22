@@ -6,8 +6,6 @@ struct AdminView: View {
     @State private var showingRoleActionSheet = false
     @State private var showingResetPasswordAlert = false
     @State private var showingCreateUserSheet = false
-    @State private var showingCreateUserResultAlert = false
-    @State private var createUserResultMessage = ""
     
     var body: some View {
         NavigationView {
@@ -60,10 +58,7 @@ struct AdminView: View {
                 )
             }
             .sheet(isPresented: $showingCreateUserSheet) {
-                CreateUserView(isPresented: $showingCreateUserSheet, showingResultAlert: $showingCreateUserResultAlert, resultMessage: $createUserResultMessage)
-            }
-            .alert(isPresented: $showingCreateUserResultAlert) {
-                Alert(title: Text("User Creation"), message: Text(createUserResultMessage), dismissButton: .default(Text("OK")))
+                CreateUserView()
             }
         }
     }
@@ -71,45 +66,6 @@ struct AdminView: View {
     private func updateRole(_ newRole: String) {
         if let userId = selectedUser?.id {
             authViewModel.updateUserRole(userId: userId, newRole: newRole)
-        }
-    }
-}
-
-struct CreateUserView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
-    @Binding var isPresented: Bool
-    @Binding var showingResultAlert: Bool
-    @Binding var resultMessage: String
-    @State private var email = ""
-    @State private var role = "bandmember"
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                TextField("Email", text: $email)
-                    .autocapitalization(.none)
-                    .keyboardType(.emailAddress)
-                Picker("Role", selection: $role) {
-                    Text("Band Member").tag("bandmember")
-                    Text("Manager").tag("manager")
-                    Text("Admin").tag("admin")
-                }
-            }
-            .navigationTitle("Create User")
-            .navigationBarItems(
-                leading: Button("Cancel") { isPresented = false },
-                trailing: Button("Create") {
-                    authViewModel.createUser(email: email, role: role) { success in
-                        if success {
-                            resultMessage = "User created successfully with default password: thetysms"
-                        } else {
-                            resultMessage = "Failed to create user. Please try again."
-                        }
-                        isPresented = false
-                        showingResultAlert = true
-                    }
-                }
-            )
         }
     }
 }

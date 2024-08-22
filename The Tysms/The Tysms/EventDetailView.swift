@@ -1,11 +1,3 @@
-//
-//  EventDetailView.swift
-//  The Tysms
-//
-//  Created by Jack Hodgy on 22/08/2024.
-//
-
-
 import SwiftUI
 
 struct EventDetailView: View {
@@ -25,10 +17,10 @@ struct EventDetailView: View {
                 Text(event.description)
                     .padding(.top)
                 
+                ResponseButtons(event: event, eventViewModel: eventViewModel)
+                
                 if authViewModel.isManager() || authViewModel.isAdmin() {
                     ResponseList(event: event)
-                } else {
-                    ResponseButtons(event: event, eventViewModel: eventViewModel)
                 }
             }
             .padding()
@@ -45,11 +37,11 @@ struct ResponseButtons: View {
     var body: some View {
         HStack {
             Button("Yes") { updateResponse("yes") }
-                .buttonStyle(ResponseButtonStyle(color: .green, isSelected: isSelected("yes")))
+                .buttonStyle(CustomResponseButtonStyle(color: .green, isSelected: isSelected("yes")))
             Button("Maybe") { updateResponse("maybe") }
-                .buttonStyle(ResponseButtonStyle(color: .yellow, isSelected: isSelected("maybe")))
+                .buttonStyle(CustomResponseButtonStyle(color: .yellow, isSelected: isSelected("maybe")))
             Button("No") { updateResponse("no") }
-                .buttonStyle(ResponseButtonStyle(color: .red, isSelected: isSelected("no")))
+                .buttonStyle(CustomResponseButtonStyle(color: .red, isSelected: isSelected("no")))
         }
     }
     
@@ -65,6 +57,7 @@ struct ResponseButtons: View {
 }
 
 struct ResponseList: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
     let event: Event
     
     var body: some View {
@@ -74,7 +67,7 @@ struct ResponseList: View {
                 .padding(.top)
             ForEach(Array(event.responses), id: \.key) { userId, response in
                 HStack {
-                    Text(userId) // You might want to fetch and display user names instead
+                    Text(authViewModel.allUsers.first(where: { $0.id == userId })?.email ?? userId)
                     Spacer()
                     Circle()
                         .fill(colorForResponse(response))
@@ -98,7 +91,7 @@ struct ResponseList: View {
     }
 }
 
-struct ResponseButtonStyle: ButtonStyle {
+struct CustomResponseButtonStyle: ButtonStyle {
     let color: Color
     let isSelected: Bool
     
@@ -108,5 +101,12 @@ struct ResponseButtonStyle: ButtonStyle {
             .background(isSelected ? color : color.opacity(0.2))
             .foregroundColor(isSelected ? .white : .primary)
             .clipShape(Capsule())
+    }
+}
+
+struct EventDetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        EventDetailView(eventViewModel: EventViewModel(), event: Event(title: "Sample Event", date: Date(), location: "Sample Location", description: "Sample Description"))
+            .environmentObject(AuthViewModel())
     }
 }
