@@ -24,10 +24,3 @@ struct FinancesView: View {
         }
     }
 }
-
-struct FinancesView_Previews: PreviewProvider {
-    static var previews: some View {
-        FinancesView(viewModel: FinanceViewModel())
-            .environmentObject(AuthViewModel())
-    }
-}
