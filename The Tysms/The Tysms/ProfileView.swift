@@ -1,7 +1,11 @@
 import SwiftUI
+import Firebase
+import FirebaseAuth
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @State private var userRole: String = ""
+    @State private var userName: String = ""
     @State private var showingChangePassword = false
 
     var body: some View {
@@ -9,8 +13,8 @@ struct ProfileView: View {
             List {
                 Section(header: Text("Account")) {
                     Text(authViewModel.currentUser?.email ?? "")
-                    Text("Role: \(authViewModel.currentUser?.role ?? "")")
-                    Text("Name: \(authViewModel.currentUser?.name ?? "Not set")")
+                    Text("Role: \(userRole)")
+                    Text("Name: \(userName)")
                 }
                 
                 Section {
@@ -29,6 +33,20 @@ struct ProfileView: View {
             .navigationTitle("Profile")
             .sheet(isPresented: $showingChangePassword) {
                 ChangePasswordView()
+            }
+            .onAppear {
+                fetchUserDetails()
+            }
+        }
+    }
+
+    private func fetchUserDetails() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).getDocument { (document, error) in
+            if let document = document, document.exists {
+                self.userRole = document.data()?["role"] as? String ?? "Unknown"
+                self.userName = document.data()?["name"] as? String ?? "Not set"
             }
         }
     }
