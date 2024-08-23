@@ -1,143 +1,138 @@
-import SwiftUI
+import Foundation
+import Firebase
 
-struct EventDetailView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
-    @ObservedObject var eventViewModel: EventViewModel
-    @Environment(\.presentationMode) var presentationMode
-    let event: Event
+class EventViewModel: ObservableObject {
+    @Published var events: [Event] = []
+    @Published var userNames: [String: String] = [:]
+    private var db = Firestore.firestore()
     
-    @State private var showingDeleteAlert = false
+    init() {
+        fetchEvents()
+        fetchUserNames()
+    }
     
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(event.title)
-                    .font(.title)
-                Text(event.date, style: .date)
-                    .font(.subheadline)
-                Text(event.location)
-                    .font(.subheadline)
-                Text(event.description)
-                    .padding(.top)
+    func fetchEvents() {
+        print("Fetching events...")
+        db.collection("events").order(by: "date").addSnapshotListener { [weak self] (querySnapshot, error) in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error fetching events: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = querySnapshot?.documents else {
+                print("No documents found")
+                return
+            }
+            
+            print("Found \(documents.count) documents")
+            
+            self.events = documents.compactMap { queryDocumentSnapshot -> Event? in
+                let data = queryDocumentSnapshot.data()
+                let id = queryDocumentSnapshot.documentID
                 
-                ResponseButtons(event: event, eventViewModel: eventViewModel)
+                guard let title = data["title"] as? String,
+                      let dateTimestamp = data["date"] as? Timestamp,
+                      let location = data["location"] as? String,
+                      let description = data["description"] as? String else {
+                    print("Error parsing document \(id): Missing or invalid fields")
+                    return nil
+                }
                 
-                if authViewModel.isManager() || authViewModel.isAdmin() {
-                    ResponseList(eventViewModel: eventViewModel, event: event)
-                    
-                    Button(action: { showingDeleteAlert = true }) {
-                        Text("Delete Event")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.red)
-                            .cornerRadius(8)
+                let date = dateTimestamp.dateValue()
+                let responses = data["responses"] as? [String: String] ?? [:]
+                
+                return Event(id: id, title: title, date: date, location: location, description: description, responses: responses)
+            }
+            
+            print("Mapped \(self.events.count) events")
+        }
+    }
+    
+    func fetchUserNames() {
+        print("Fetching user names...")
+        db.collection("userRoles").getDocuments { [weak self] (querySnapshot, error) in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error fetching user names: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = querySnapshot?.documents else {
+                print("No user documents found")
+                return
+            }
+            
+            self.userNames = documents.reduce(into: [:]) { result, document in
+                let userId = document.documentID
+                let name = document.data()["name"] as? String ?? document.data()["email"] as? String ?? "Unknown User"
+                result[userId] = name
+            }
+            
+            print("Fetched \(self.userNames.count) user names")
+            self.objectWillChange.send()
+        }
+    }
+    
+    func addEvent(title: String, date: Date, location: String, description: String) {
+        let newEvent: [String: Any] = [
+            "title": title,
+            "date": Timestamp(date: date),
+            "location": location,
+            "description": description,
+            "responses": [:]
+        ]
+        
+        db.collection("events").addDocument(data: newEvent) { error in
+            if let error = error {
+                print("Error adding event: \(error.localizedDescription)")
+            } else {
+                print("Event added successfully")
+            }
+        }
+    }
+    
+    func updateEventResponse(eventId: String, userId: String, response: String?) {
+        db.collection("events").document(eventId).getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            
+            if let document = document, document.exists {
+                var responses = document.data()?["responses"] as? [String: String] ?? [:]
+                
+                if let response = response {
+                    responses[userId] = response
+                } else {
+                    responses.removeValue(forKey: userId)
+                }
+                
+                self.db.collection("events").document(eventId).updateData(["responses": responses]) { error in
+                    if let error = error {
+                        print("Error updating event response: \(error.localizedDescription)")
+                    } else {
+                        print("Event response updated successfully")
+                        self.fetchEvents() // Refresh events after updating
                     }
-                    .padding(.top)
-                }
-            }
-            .padding()
-        }
-        .navigationTitle("Event Details")
-        .alert(isPresented: $showingDeleteAlert) {
-            Alert(
-                title: Text("Delete Event"),
-                message: Text("Are you sure you want to delete this event?"),
-                primaryButton: .destructive(Text("Delete")) {
-                    deleteEvent()
-                },
-                secondaryButton: .cancel()
-            )
-        }
-    }
-    
-    private func deleteEvent() {
-        if let eventId = event.id {
-            eventViewModel.deleteEvent(eventId: eventId)
-            presentationMode.wrappedValue.dismiss()
-        }
-    }
-}
-
-struct ResponseButtons: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
-    let event: Event
-    @ObservedObject var eventViewModel: EventViewModel
-    
-    var body: some View {
-        HStack {
-            Button("Yes") { updateResponse("yes") }
-                .buttonStyle(CustomResponseButtonStyle(color: .green, isSelected: isSelected("yes")))
-            Button("Maybe") { updateResponse("maybe") }
-                .buttonStyle(CustomResponseButtonStyle(color: .yellow, isSelected: isSelected("maybe")))
-            Button("No") { updateResponse("no") }
-                .buttonStyle(CustomResponseButtonStyle(color: .red, isSelected: isSelected("no")))
-            Button("Clear") { updateResponse(nil) }
-                .buttonStyle(CustomResponseButtonStyle(color: .gray, isSelected: false))
-        }
-    }
-    
-    func updateResponse(_ response: String?) {
-        guard let userId = authViewModel.currentUser?.uid, let eventId = event.id else { return }
-        eventViewModel.updateEventResponse(eventId: eventId, userId: userId, response: response)
-    }
-    
-    func isSelected(_ response: String) -> Bool {
-        guard let userId = authViewModel.currentUser?.uid else { return false }
-        return event.responses[userId] == response
-    }
-}
-
-struct ResponseList: View {
-    @ObservedObject var eventViewModel: EventViewModel
-    let event: Event
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Responses")
-                .font(.headline)
-                .padding(.top)
-            ForEach(Array(event.responses), id: \.key) { userId, response in
-                HStack {
-                    Text(eventViewModel.getUserName(for: userId))
-                    Spacer()
-                    Circle()
-                        .fill(colorForResponse(response))
-                        .frame(width: 20, height: 20)
                 }
             }
         }
     }
     
-    func colorForResponse(_ response: String) -> Color {
-        switch response {
-        case "yes":
-            return .green
-        case "maybe":
-            return .yellow
-        case "no":
-            return .red
-        default:
-            return .gray
+    func deleteEvent(eventId: String) {
+        db.collection("events").document(eventId).delete { [weak self] error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error deleting event: \(error.localizedDescription)")
+            } else {
+                print("Event deleted successfully")
+                self.fetchEvents() // Refresh events after deleting
+            }
         }
     }
-}
-
-struct CustomResponseButtonStyle: ButtonStyle {
-    let color: Color
-    let isSelected: Bool
     
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .background(isSelected ? color : color.opacity(0.2))
-            .foregroundColor(isSelected ? .white : .primary)
-            .clipShape(Capsule())
-    }
-}
-
-struct EventDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        EventDetailView(eventViewModel: EventViewModel(), event: Event(id: "1", title: "Sample Event", date: Date(), location: "Sample Location", description: "Sample Description", responses: [:]))
-            .environmentObject(AuthViewModel())
+    func getUserName(for userId: String) -> String {
+        return userNames[userId] ?? "Unknown User"
     }
 }

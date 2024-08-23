@@ -3,7 +3,6 @@ import SwiftUI
 struct EventDetailView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @ObservedObject var eventViewModel: EventViewModel
-    @Environment(\.presentationMode) var presentationMode
     let event: Event
     
     @State private var showingDeleteAlert = false
@@ -23,7 +22,7 @@ struct EventDetailView: View {
                 ResponseButtons(event: event, eventViewModel: eventViewModel)
                 
                 if authViewModel.isManager() || authViewModel.isAdmin() {
-                    ResponseList(event: event)
+                    ResponseList(eventViewModel: eventViewModel, event: event)
                     
                     Button(action: { showingDeleteAlert = true }) {
                         Text("Delete Event")
@@ -48,12 +47,14 @@ struct EventDetailView: View {
                 secondaryButton: .cancel()
             )
         }
+        .onAppear {
+            eventViewModel.fetchUserNames()
+        }
     }
     
     private func deleteEvent() {
         if let eventId = event.id {
             eventViewModel.deleteEvent(eventId: eventId)
-            presentationMode.wrappedValue.dismiss()
         }
     }
 }
@@ -88,7 +89,7 @@ struct ResponseButtons: View {
 }
 
 struct ResponseList: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
+    @ObservedObject var eventViewModel: EventViewModel
     let event: Event
     
     var body: some View {
@@ -98,7 +99,7 @@ struct ResponseList: View {
                 .padding(.top)
             ForEach(Array(event.responses), id: \.key) { userId, response in
                 HStack {
-                    Text(getUserName(for: userId))
+                    Text(eventViewModel.getUserName(for: userId))
                     Spacer()
                     Circle()
                         .fill(colorForResponse(response))
@@ -106,13 +107,6 @@ struct ResponseList: View {
                 }
             }
         }
-    }
-    
-    func getUserName(for userId: String) -> String {
-        if let user = authViewModel.allUsers.first(where: { $0.id == userId }) {
-            return user.name.isEmpty ? user.email : user.name
-        }
-        return "Unknown User"
     }
     
     func colorForResponse(_ response: String) -> Color {
@@ -139,12 +133,5 @@ struct CustomResponseButtonStyle: ButtonStyle {
             .background(isSelected ? color : color.opacity(0.2))
             .foregroundColor(isSelected ? .white : .primary)
             .clipShape(Capsule())
-    }
-}
-
-struct EventDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        EventDetailView(eventViewModel: EventViewModel(), event: Event(id: "1", title: "Sample Event", date: Date(), location: "Sample Location", description: "Sample Description", responses: [:]))
-            .environmentObject(AuthViewModel())
     }
 }
