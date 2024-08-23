@@ -1,20 +1,35 @@
-//
-//  ProfileView.swift
-//  The Tysms
-//
-//  Created by Jack Hodgy on 23/08/2024.
-//
-
-
 import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @State private var showingChangePassword = false
 
     var body: some View {
         NavigationView {
-            Text("Profile View")
-                .navigationTitle("Profile")
+            List {
+                Section(header: Text("Account")) {
+                    Text(authViewModel.currentUser?.email ?? "")
+                    Text("Role: \(authViewModel.currentUser?.role ?? "")")
+                    Text("Name: \(authViewModel.currentUser?.name ?? "Not set")")
+                }
+                
+                Section {
+                    Button("Change Password") {
+                        showingChangePassword = true
+                    }
+                }
+                
+                Section {
+                    Button("Logout") {
+                        authViewModel.signOut()
+                    }
+                    .foregroundColor(.red)
+                }
+            }
+            .navigationTitle("Profile")
+            .sheet(isPresented: $showingChangePassword) {
+                ChangePasswordView()
+            }
         }
     }
 }

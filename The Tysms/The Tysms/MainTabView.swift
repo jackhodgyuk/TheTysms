@@ -17,10 +17,22 @@ struct MainTabView: View {
                     Label("Finances", systemImage: "dollarsign.circle")
                 }
             
+            SetlistView()
+                .tabItem {
+                    Label("Setlist", systemImage: "music.note.list")
+                }
+            
             ProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person.crop.circle")
                 }
+            
+            if authViewModel.currentUser?.isAdmin == true {
+                AdminView()
+                    .tabItem {
+                        Label("Admin", systemImage: "gear")
+                    }
+            }
         }
     }
 }
