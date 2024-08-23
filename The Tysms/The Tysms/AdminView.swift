@@ -4,10 +4,9 @@ struct AdminView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var selectedUser: AuthViewModel.User?
     @State private var showingRoleActionSheet = false
-    @State private var showingResetPasswordAlert = false
     @State private var showingCreateUserSheet = false
     @State private var showUpdateNameView = false
-    
+
     var body: some View {
         NavigationView {
             List {
@@ -29,6 +28,7 @@ struct AdminView: View {
                         selectedUser = user
                     }
                 }
+                .onDelete(perform: deleteUser)
             }
             .navigationTitle("Admin Panel")
             .navigationBarItems(trailing:
@@ -46,23 +46,8 @@ struct AdminView: View {
                     .default(Text("Band Member")) { updateRole("bandmember") },
                     .default(Text("Manager")) { updateRole("manager") },
                     .default(Text("Admin")) { updateRole("admin") },
-                    .destructive(Text("Reset Password")) {
-                        showingResetPasswordAlert = true
-                    },
                     .cancel()
                 ])
-            }
-            .alert(isPresented: $showingResetPasswordAlert) {
-                Alert(
-                    title: Text("Reset Password"),
-                    message: Text("Are you sure you want to reset the password for \(selectedUser?.email ?? "")?"),
-                    primaryButton: .destructive(Text("Reset")) {
-                        if let email = selectedUser?.email {
-                            authViewModel.resetUserPassword(email: email)
-                        }
-                    },
-                    secondaryButton: .cancel()
-                )
             }
             .sheet(isPresented: $showingCreateUserSheet) {
                 CreateUserView()
@@ -80,11 +65,11 @@ struct AdminView: View {
             authViewModel.updateUserRole(userId: userId, newRole: newRole)
         }
     }
-}
-
-struct AdminView_Previews: PreviewProvider {
-    static var previews: some View {
-        AdminView()
-            .environmentObject(AuthViewModel())
+    
+    private func deleteUser(at offsets: IndexSet) {
+        offsets.forEach { index in
+            let user = authViewModel.allUsers[index]
+            authViewModel.deleteUser(userId: user.id)
+        }
     }
 }

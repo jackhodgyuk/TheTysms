@@ -3,46 +3,49 @@ import SwiftUI
 struct ChangePasswordView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @Environment(\.presentationMode) var presentationMode
-    @State private var email: String = ""
+    @State private var currentPassword = ""
+    @State private var newPassword = ""
+    @State private var confirmPassword = ""
     @State private var showAlert = false
     @State private var alertMessage = ""
 
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Reset Password")) {
-                    TextField("Email", text: $email)
-                }
-                
-                Section {
-                    Button("Reset Password") {
-                        resetPassword()
-                    }
-                }
+                SecureField("Current Password", text: $currentPassword)
+                SecureField("New Password", text: $newPassword)
+                SecureField("Confirm New Password", text: $confirmPassword)
             }
-            .navigationTitle("Reset Password")
+            .navigationTitle("Change Password")
+            .navigationBarItems(leading: Button("Cancel") {
+                presentationMode.wrappedValue.dismiss()
+            }, trailing: Button("Save") {
+                changePassword()
+            })
             .alert(isPresented: $showAlert) {
-                Alert(title: Text("Password Reset"),
-                      message: Text(alertMessage),
-                      dismissButton: .default(Text("OK")) {
-                    if alertMessage == "Password reset email sent successfully" {
+                Alert(title: Text("Change Password"), message: Text(alertMessage), dismissButton: .default(Text("OK")) {
+                    if alertMessage == "Password changed successfully" {
                         presentationMode.wrappedValue.dismiss()
                     }
                 })
             }
         }
     }
-    
-    private func resetPassword() {
-        authViewModel.resetUserPassword(email: email)
-        alertMessage = "Password reset email sent successfully"
-        showAlert = true
-    }
-}
 
-struct ChangePasswordView_Previews: PreviewProvider {
-    static var previews: some View {
-        ChangePasswordView()
-            .environmentObject(AuthViewModel())
+    private func changePassword() {
+        if newPassword != confirmPassword {
+            alertMessage = "New passwords do not match"
+            showAlert = true
+            return
+        }
+        
+        authViewModel.changePassword(currentPassword: currentPassword, newPassword: newPassword) { success, error in
+            if success {
+                alertMessage = "Password changed successfully"
+            } else {
+                alertMessage = error?.localizedDescription ?? "Failed to change password"
+            }
+            showAlert = true
+        }
     }
 }
