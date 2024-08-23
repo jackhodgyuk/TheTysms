@@ -1,13 +1,6 @@
-//
-//  FinanceViewModel.swift
-//  The Tysms
-//
-//  Created by Jack Hodgy on 23/08/2024.
-//
-
-
-import Foundation
 import Firebase
+import FirebaseFirestore
+
 
 class FinanceViewModel: ObservableObject {
     @Published var finances: [Finance] = []
@@ -27,7 +20,17 @@ class FinanceViewModel: ObservableObject {
             }
             
             self.finances = documents.compactMap { queryDocumentSnapshot -> Finance? in
-                return try? queryDocumentSnapshot.data(as: Finance.self)
+                let data = queryDocumentSnapshot.data()
+                let id = queryDocumentSnapshot.documentID
+                guard let date = (data["date"] as? Timestamp)?.dateValue(),
+                      let amount = data["amount"] as? Double,
+                      let description = data["description"] as? String,
+                      let typeRawValue = data["type"] as? String,
+                      let type = Finance.FinanceType(rawValue: typeRawValue),
+                      let category = data["category"] as? String else {
+                    return nil
+                }
+                return Finance(id: id, date: date, amount: amount, description: description, type: type, category: category)
             }
         }
     }
@@ -40,16 +43,28 @@ class FinanceViewModel: ObservableObject {
             }
             
             self.purchaseRequests = documents.compactMap { queryDocumentSnapshot -> PurchaseRequest? in
-                return try? queryDocumentSnapshot.data(as: PurchaseRequest.self)
+                let data = queryDocumentSnapshot.data()
+                let id = queryDocumentSnapshot.documentID
+                guard let requesterId = data["requesterId"] as? String,
+                      let itemName = data["itemName"] as? String,
+                      let itemDescription = data["itemDescription"] as? String,
+                      let cost = data["cost"] as? Double,
+                      let dateRequested = (data["dateRequested"] as? Timestamp)?.dateValue(),
+                      let approvals = data["approvals"] as? [String],
+                      let statusRawValue = data["status"] as? String,
+                      let status = PurchaseRequest.RequestStatus(rawValue: statusRawValue) else {
+                    return nil
+                }
+                return PurchaseRequest(id: id, requesterId: requesterId, itemName: itemName, itemDescription: itemDescription, cost: cost, dateRequested: dateRequested, approvals: approvals, status: status)
             }
         }
     }
     
     func addFinance(date: Date, amount: Double, description: String, type: Finance.FinanceType, category: String) {
-        let newFinance = Finance(date: date, amount: amount, description: description, type: type, category: category)
+        let newFinance = Finance(id: UUID().uuidString, date: date, amount: amount, description: description, type: type, category: category)
         
         do {
-            _ = try db.collection("finances").addDocument(from: newFinance)
+            try db.collection("finances").document(newFinance.id!).setData(from: newFinance)
         } catch {
             print("Error adding finance: \(error)")
         }
@@ -64,7 +79,8 @@ class FinanceViewModel: ObservableObject {
     }
     
     func submitPurchaseRequest(itemName: String, itemDescription: String, cost: Double, requesterId: String) {
-        let newRequest = PurchaseRequest(requesterId: requesterId,
+        let newRequest = PurchaseRequest(id: UUID().uuidString,
+                                         requesterId: requesterId,
                                          itemName: itemName,
                                          itemDescription: itemDescription,
                                          cost: cost,
@@ -73,7 +89,7 @@ class FinanceViewModel: ObservableObject {
                                          status: .pending)
         
         do {
-            _ = try db.collection("purchaseRequests").addDocument(from: newRequest)
+            try db.collection("purchaseRequests").document(newRequest.id!).setData(from: newRequest)
         } catch {
             print("Error adding purchase request: \(error)")
         }

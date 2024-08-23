@@ -1,49 +1,25 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @StateObject private var financeViewModel = FinanceViewModel()
     @EnvironmentObject var authViewModel: AuthViewModel
-    
+
     var body: some View {
         TabView {
-            EventListView()
+            EventsView()
                 .tabItem {
                     Label("Events", systemImage: "calendar")
                 }
             
-            SetlistView()
-                .tabItem {
-                    Label("Setlist", systemImage: "music.note.list")
-                }
-            
-            FinanceRequestView()
+            FinancesView(viewModel: financeViewModel)
                 .tabItem {
                     Label("Finances", systemImage: "dollarsign.circle")
                 }
             
-            if authViewModel.isManager() || authViewModel.isAdmin() {
-                ManagerView()
-                    .tabItem {
-                        Label("Manage", systemImage: "person.2")
-                    }
-            }
-            
-            if authViewModel.isAdmin() {
-                AdminView()
-                    .tabItem {
-                        Label("Admin", systemImage: "gear")
-                    }
-            }
-            
-            SettingsView()
+            ProfileView()
                 .tabItem {
-                    Label("Settings", systemImage: "gearshape")
+                    Label("Profile", systemImage: "person.crop.circle")
                 }
-        }
-        .onAppear {
-            print("MainTabView appeared")
-            print("User role: \(authViewModel.currentUserRole ?? "nil")")
-            print("Is admin: \(authViewModel.isAdmin())")
-            print("Is manager: \(authViewModel.isManager())")
         }
     }
 }
