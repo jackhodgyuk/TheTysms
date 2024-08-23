@@ -39,11 +39,11 @@ struct ChangePasswordView: View {
             return
         }
         
-        authViewModel.changePassword(currentPassword: currentPassword, newPassword: newPassword) { success, error in
-            if success {
-                alertMessage = "Password changed successfully"
+        authViewModel.changePassword(currentPassword: currentPassword, newPassword: newPassword) { error in
+            if let error = error {
+                alertMessage = error.localizedDescription
             } else {
-                alertMessage = error?.localizedDescription ?? "Failed to change password"
+                alertMessage = "Password changed successfully"
             }
             showAlert = true
         }

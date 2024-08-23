@@ -1,16 +1,18 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @StateObject private var financeViewModel = FinanceViewModel()
+    @StateObject private var eventViewModel = EventViewModel()
     @EnvironmentObject var authViewModel: AuthViewModel
 
     var body: some View {
         TabView {
-            EventsView(eventViewModel: EventViewModel())
+            EventsView(eventViewModel: eventViewModel)
                 .tabItem {
                     Label("Events", systemImage: "calendar")
                 }
             
-            FinancesView(viewModel: FinanceViewModel())
+            FinancesView(viewModel: financeViewModel)
                 .tabItem {
                     Label("Finances", systemImage: "dollarsign.circle")
                 }
@@ -25,7 +27,7 @@ struct MainTabView: View {
                     Label("Settings", systemImage: "gear")
                 }
             
-            if authViewModel.currentUser?.role == "admin" {
+            if authViewModel.currentUser?.isAdmin == true {
                 AdminView()
                     .tabItem {
                         Label("Admin", systemImage: "person.3")

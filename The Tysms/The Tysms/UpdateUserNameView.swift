@@ -22,8 +22,11 @@ struct UpdateUserNameView: View {
     }
 
     private func updateName() {
-        authViewModel.updateUserName(userId: userId, newName: newName) { success in
-            if success {
+        authViewModel.updateUserName(userId: userId, name: newName) { error in
+            if let error = error {
+                // Handle error
+                print("Error updating name: \(error.localizedDescription)")
+            } else {
                 presentationMode.wrappedValue.dismiss()
             }
         }

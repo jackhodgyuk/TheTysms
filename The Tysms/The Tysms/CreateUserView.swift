@@ -37,11 +37,11 @@ struct CreateUserView: View {
     }
 
     private func createUser() {
-        authViewModel.createUser(email: email, name: name, role: role, password: "thetysms") { success, error in
-            if success {
-                alertMessage = "User created successfully"
+        authViewModel.createUser(email: email, name: name, role: role) { error in
+            if let error = error {
+                alertMessage = error.localizedDescription
             } else {
-                alertMessage = error?.localizedDescription ?? "Failed to create user"
+                alertMessage = "User created successfully"
             }
             showAlert = true
         }
