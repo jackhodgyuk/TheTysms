@@ -3,7 +3,6 @@ import SwiftUI
 struct AddEventView: View {
     @ObservedObject var eventViewModel: EventViewModel
     @Environment(\.presentationMode) var presentationMode
-    
     @State private var title = ""
     @State private var date = Date()
     @State private var location = ""
@@ -12,33 +11,30 @@ struct AddEventView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Event Details")) {
-                    TextField("Title", text: $title)
-                    DatePicker("Date", selection: $date, displayedComponents: [.date, .hourAndMinute])
-                    TextField("Location", text: $location)
-                    TextField("Description", text: $description)
-                }
+                TextField("Title", text: $title)
+                DatePicker("Date", selection: $date, displayedComponents: .date)
+                TextField("Location", text: $location)
+                TextField("Description", text: $description)
             }
-            .navigationTitle("Add Event")
-            .navigationBarItems(
-                leading: Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
-                },
-                trailing: Button("Save") {
-                    saveEvent()
-                }
-            )
+            .navigationBarTitle("Add Event")
+            .navigationBarItems(leading: cancelButton, trailing: addButton)
         }
     }
     
-    private func saveEvent() {
-        eventViewModel.addEvent(title: title, date: date, location: location, description: description)
-        presentationMode.wrappedValue.dismiss()
+    private var cancelButton: some View {
+        Button("Cancel") {
+            presentationMode.wrappedValue.dismiss()
+        }
     }
-}
-
-struct AddEventView_Previews: PreviewProvider {
-    static var previews: some View {
-        AddEventView(eventViewModel: EventViewModel())
+    
+    private var addButton: some View {
+        Button("Add") {
+            let newEvent = Event(title: title, date: date, location: location, description: description)
+            eventViewModel.addEvent(newEvent) { success in
+                if success {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
     }
 }

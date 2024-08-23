@@ -1,137 +1,128 @@
 import SwiftUI
+import FirebaseAuth
 
 struct EventDetailView: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
     @ObservedObject var eventViewModel: EventViewModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     let event: Event
-    
+    @State private var userResponse: String = ""
     @State private var showingDeleteAlert = false
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 Text(event.title)
                     .font(.title)
                 Text(event.date, style: .date)
-                    .font(.subheadline)
                 Text(event.location)
-                    .font(.subheadline)
                 Text(event.description)
-                    .padding(.top)
                 
-                ResponseButtons(event: event, eventViewModel: eventViewModel)
+                Divider()
+                /Users/jackhodgy/Documents/GitHub/TheTysms/The Tysms/The Tysms/EventDetailView.swift:28:34 Referencing subscript 'subscript(dynamicMember:)' requires wrapper 'EnvironmentObject<AuthViewModel>.Wrapper'
+
+                Text("Responses:")
+                    .font(.headline)
                 
-                if authViewModel.isManager() || authViewModel.isAdmin() {
-                    ResponseList(eventViewModel: eventViewModel, event: event)
-                    
-                    Button(action: { showingDeleteAlert = true }) {
-                        Text("Delete Event")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.red)
-                            .cornerRadius(8)
+                if authViewModel.currentUserRole == "admin" {
+                    ForEach(Array(event.responses), id: \.key) { userId, response in
+                        HStack {
+                            Text(authViewModel.getUserName(for: userId))
+                            Spacer()
+                            Text(response)
+                            responseIcon(for: response)
+                        }
                     }
-                    .padding(.top)
                 }
+                
+                HStack {
+                    responseButton(response: "Yes", color: .green)
+                    responseButton(response: "Maybe", color: .yellow)
+                    responseButton(response: "No", color: .red)
+                }
+                .padding(.top)
             }
             .padding()
         }
-        .navigationTitle("Event Details")
+        .navigationBarItems(trailing: Group {
+            if authViewModel.currentUserRole == "admin" {
+                Button(action: {
+                    showingDeleteAlert = true
+                }) {
+                    Image(systemName: "trash")
+                }
+            }
+        })
         .alert(isPresented: $showingDeleteAlert) {
             Alert(
                 title: Text("Delete Event"),
                 message: Text("Are you sure you want to delete this event?"),
                 primaryButton: .destructive(Text("Delete")) {
-                    deleteEvent()
+                    eventViewModel.deleteEvent(event) { success in
+                        if success {
+                            print("Event deleted successfully")
+                        } else {
+                            print("Failed to delete event")
+                        }
+                    }
                 },
                 secondaryButton: .cancel()
             )
         }
         .onAppear {
-            eventViewModel.fetchUserNames()
-        }
-    }
-    
-    private func deleteEvent() {
-        if let eventId = event.id {
-            eventViewModel.deleteEvent(eventId: eventId)
-        }
-    }
-}
-
-struct ResponseButtons: View {
-    @EnvironmentObject var authViewModel: AuthViewModel
-    let event: Event
-    @ObservedObject var eventViewModel: EventViewModel
-    
-    var body: some View {
-        HStack {
-            Button("Yes") { updateResponse("yes") }
-                .buttonStyle(CustomResponseButtonStyle(color: .green, isSelected: isSelected("yes")))
-            Button("Maybe") { updateResponse("maybe") }
-                .buttonStyle(CustomResponseButtonStyle(color: .yellow, isSelected: isSelected("maybe")))
-            Button("No") { updateResponse("no") }
-                .buttonStyle(CustomResponseButtonStyle(color: .red, isSelected: isSelected("no")))
-            Button("Clear") { updateResponse(nil) }
-                .buttonStyle(CustomResponseButtonStyle(color: .gray, isSelected: false))
-        }
-    }
-    
-    func updateResponse(_ response: String?) {
-        guard let userId = authViewModel.currentUser?.uid, let eventId = event.id else { return }
-        eventViewModel.updateEventResponse(eventId: eventId, userId: userId, response: response)
-    }
-    
-    func isSelected(_ response: String) -> Bool {
-        guard let userId = authViewModel.currentUser?.uid else { return false }
-        return event.responses[userId] == response
-    }
-}
-
-struct ResponseList: View {
-    @ObservedObject var eventViewModel: EventViewModel
-    let event: Event
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Responses")
-                .font(.headline)
-                .padding(.top)
-            ForEach(Array(event.responses), id: \.key) { userId, response in
-                HStack {
-                    Text(eventViewModel.getUserName(for: userId))
-                    Spacer()
-                    Circle()
-                        .fill(colorForResponse(response))
-                        .frame(width: 20, height: 20)
-                }
+            if let userId = Auth.auth().currentUser?.uid {
+                userResponse = event.responses[userId] ?? ""
             }
         }
     }
     
-    func colorForResponse(_ response: String) -> Color {
-        switch response {
-        case "yes":
-            return .green
-        case "maybe":
-            return .yellow
-        case "no":
-            return .red
-        default:
-            return .gray
+    private func responseButton(response: String, color: Color) -> some View {
+        Button(action: {
+            updateResponse(response)
+        }) {
+            ZStack {
+                Circle()
+                    .fill(color)
+                    .frame(width: 60, height: 60)
+                Text(response)
+                    .foregroundColor(.white)
+                    .fontWeight(.bold)
+            }
         }
     }
-}
-
-struct CustomResponseButtonStyle: ButtonStyle {
-    let color: Color
-    let isSelected: Bool
     
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .background(isSelected ? color : color.opacity(0.2))
-            .foregroundColor(isSelected ? .white : .primary)
-            .clipShape(Capsule())
+    private func responseIcon(for response: String) -> some View {
+        let iconName: String
+        let color: Color
+        switch response {
+        case "Yes":
+            iconName = "checkmark.circle.fill"
+            color = .green
+        case "Maybe":
+            iconName = "questionmark.circle.fill"
+            color = .yellow
+        case "No":
+            iconName = "xmark.circle.fill"
+            color = .red
+        default:
+            iconName = "circle"
+            color = .gray
+        }
+        return Image(systemName: iconName)
+            .foregroundColor(color)
+    }
+    
+    private func updateResponse(_ newResponse: String) {
+        if let userId = Auth.auth().currentUser?.uid {
+            var updatedEvent = event
+            updatedEvent.responses[userId] = newResponse
+            eventViewModel.updateEvent(updatedEvent) { success in
+                if success {
+                    print("Response updated successfully")
+                    userResponse = newResponse
+                } else {
+                    print("Failed to update response")
+                }
+            }
+        }
     }
 }

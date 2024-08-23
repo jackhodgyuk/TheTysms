@@ -7,21 +7,31 @@ struct EventsView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(eventViewModel.events) { event in
-                    NavigationLink(destination: EventDetailView(eventViewModel: eventViewModel, event: event)) {
-                        EventRow(event: event)
-                    }
+            List(eventViewModel.events) { event in
+                NavigationLink(destination: EventDetailView(eventViewModel: eventViewModel, event: event)) {
+                    EventRow(event: event)
                 }
             }
-            .navigationTitle("Events")
-            .navigationBarItems(trailing: Button(action: { showingAddEvent = true }) {
-                Image(systemName: "plus")
-            })
+            .navigationBarTitle("Events")
+            .navigationBarItems(trailing: addButton)
             .sheet(isPresented: $showingAddEvent) {
                 AddEventView(eventViewModel: eventViewModel)
             }
         }
+        .onAppear {
+            eventViewModel.fetchEvents()
+        }
+    }
+    
+    private var addButton: some View {
+        Button(action: {
+            if authViewModel.isManager() {
+                showingAddEvent = true
+            }
+        }) {
+            Image(systemName: "plus")
+        }
+        .disabled(!authViewModel.isManager())
     }
 }
 
@@ -32,15 +42,10 @@ struct EventRow: View {
         VStack(alignment: .leading) {
             Text(event.title)
                 .font(.headline)
-            Text(event.date.formatted(date: .abbreviated, time: .shortened))
+            Text(event.date, style: .date)
+                .font(.subheadline)
+            Text(event.location)
                 .font(.subheadline)
         }
-    }
-}
-
-struct EventsView_Previews: PreviewProvider {
-    static var previews: some View {
-        EventsView(eventViewModel: EventViewModel())
-            .environmentObject(AuthViewModel())
     }
 }
