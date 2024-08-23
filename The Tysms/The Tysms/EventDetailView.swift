@@ -18,15 +18,14 @@ struct EventDetailView: View {
                 Text(event.description)
                 
                 Divider()
-                /Users/jackhodgy/Documents/GitHub/TheTysms/The Tysms/The Tysms/EventDetailView.swift:28:34 Referencing subscript 'subscript(dynamicMember:)' requires wrapper 'EnvironmentObject<AuthViewModel>.Wrapper'
-
+                
                 Text("Responses:")
                     .font(.headline)
                 
-                if authViewModel.currentUserRole == "admin" {
+                if authViewModel.currentUser?.role == "admin" {
                     ForEach(Array(event.responses), id: \.key) { userId, response in
                         HStack {
-                            Text(authViewModel.getUserName(for: userId))
+                            Text(authViewModel.getUserName(for: userId) ?? userId)
                             Spacer()
                             Text(response)
                             responseIcon(for: response)
@@ -44,7 +43,7 @@ struct EventDetailView: View {
             .padding()
         }
         .navigationBarItems(trailing: Group {
-            if authViewModel.currentUserRole == "admin" {
+            if authViewModel.currentUser?.role == "admin" {
                 Button(action: {
                     showingDeleteAlert = true
                 }) {
