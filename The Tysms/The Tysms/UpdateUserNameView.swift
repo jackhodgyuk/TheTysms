@@ -6,6 +6,8 @@ struct UpdateUserNameView: View {
     let userId: String
     let currentEmail: String
     @State private var newName = ""
+    @State private var showAlert = false
+    @State private var alertMessage = ""
 
     var body: some View {
         NavigationView {
@@ -18,16 +20,19 @@ struct UpdateUserNameView: View {
             }, trailing: Button("Save") {
                 updateName()
             })
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("Update Name"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            }
         }
     }
 
     private func updateName() {
-        authViewModel.updateUserName(userId: userId, name: newName) { error in
-            if let error = error {
-                // Handle error
-                print("Error updating name: \(error.localizedDescription)")
-            } else {
+        authViewModel.updateUserName(userId: userId, name: newName) { success in
+            if success {
                 presentationMode.wrappedValue.dismiss()
+            } else {
+                alertMessage = "Failed to update name"
+                showAlert = true
             }
         }
     }

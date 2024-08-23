@@ -4,13 +4,12 @@ struct AdminView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var selectedUser: AuthViewModel.User?
     @State private var showingRoleActionSheet = false
-    @State private var showingCreateUserSheet = false
-    @State private var showUpdateNameView = false
+    @State private var showingUpdateNameView = false
 
     var body: some View {
         NavigationView {
             List {
-                ForEach(authViewModel.allUsers) { user in
+                ForEach(authViewModel.allUsers, id: \.email) { user in
                     VStack(alignment: .leading) {
                         Text(user.email)
                             .font(.headline)
@@ -24,20 +23,15 @@ struct AdminView: View {
                         showingRoleActionSheet = true
                     }
                     Button("Update Name") {
-                        showUpdateNameView = true
+                        showingUpdateNameView = true
                         selectedUser = user
                     }
+                    Button("Reset Password") {
+                        resetPassword(for: user)
+                    }
                 }
-                .onDelete(perform: deleteUser)
             }
             .navigationTitle("Admin Panel")
-            .navigationBarItems(trailing:
-                Button(action: {
-                    showingCreateUserSheet = true
-                }) {
-                    Image(systemName: "plus")
-                }
-            )
             .onAppear {
                 authViewModel.fetchAllUsers()
             }
@@ -49,10 +43,7 @@ struct AdminView: View {
                     .cancel()
                 ])
             }
-            .sheet(isPresented: $showingCreateUserSheet) {
-                CreateUserView()
-            }
-            .sheet(isPresented: $showUpdateNameView) {
+            .sheet(isPresented: $showingUpdateNameView) {
                 if let user = selectedUser {
                     UpdateUserNameView(userId: user.id, currentEmail: user.email)
                 }
@@ -66,10 +57,7 @@ struct AdminView: View {
         }
     }
     
-    private func deleteUser(at offsets: IndexSet) {
-        offsets.forEach { index in
-            let user = authViewModel.allUsers[index]
-            authViewModel.deleteUser(userId: user.id)
-        }
+    private func resetPassword(for user: AuthViewModel.User) {
+        authViewModel.resetUserPassword(email: user.email)
     }
 }

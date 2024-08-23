@@ -6,21 +6,35 @@ struct LoginView: View {
     @State private var password = ""
     
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
+            // Band Logo
+            Image("TysmsLogo") // Make sure you have an image named "BandLogo" in your asset catalog
+                .resizable()
+                .scaledToFit()
+                .frame(width: 200, height: 200) // Adjust size as needed
+                .padding(.bottom, 40)
+            
             TextField("Email", text: $email)
                 .autocapitalization(.none)
                 .keyboardType(.emailAddress)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
+                .padding(.horizontal)
             
             SecureField("Password", text: $password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
+                .padding(.horizontal)
             
-            Button("Login") {
+            Button(action: {
                 authViewModel.signIn(email: email, password: password)
+            }) {
+                Text("Login")
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(10)
             }
-            .padding()
+            .padding(.horizontal)
         }
         .padding()
     }

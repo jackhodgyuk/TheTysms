@@ -12,14 +12,14 @@ struct MainTabView: View {
                     Label("Events", systemImage: "calendar")
                 }
             
-            FinancesView(viewModel: financeViewModel)
-                .tabItem {
-                    Label("Finances", systemImage: "dollarsign.circle")
-                }
-            
             SetlistView()
                 .tabItem {
                     Label("Setlist", systemImage: "music.note.list")
+                }
+            
+            FinancesView(viewModel: financeViewModel)
+                .tabItem {
+                    Label("Finances", systemImage: "dollarsign.circle")
                 }
             
             SettingsView()
@@ -27,7 +27,7 @@ struct MainTabView: View {
                     Label("Settings", systemImage: "gear")
                 }
             
-            if authViewModel.currentUser?.isAdmin == true {
+            if authViewModel.isAdmin() {
                 AdminView()
                     .tabItem {
                         Label("Admin", systemImage: "person.3")
