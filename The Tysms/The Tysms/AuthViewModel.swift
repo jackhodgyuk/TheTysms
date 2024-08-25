@@ -103,6 +103,10 @@ class AuthViewModel: ObservableObject {
         return currentUserRole?.lowercased() == "bandmember" || isManager()
     }
     
+    func isAdminOrManager() -> Bool {
+        return isAdmin() || isManager()
+    }
+    
     func fetchAllUsers() {
         db.collection("userRoles").getDocuments { [weak self] querySnapshot, error in
             if let error = error {

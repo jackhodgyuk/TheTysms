@@ -1,5 +1,6 @@
 import Foundation
 import Firebase
+import FirebaseFirestore
 
 class EventViewModel: ObservableObject {
     @Published var events: [Event] = []
@@ -21,6 +22,7 @@ class EventViewModel: ObservableObject {
     func addEvent(_ event: Event, completion: @escaping (Bool) -> Void) {
         do {
             let _ = try db.collection("events").addDocument(from: event)
+            sendEventNotification(eventTitle: event.title)
             completion(true)
         } catch {
             print("Error adding event: \(error)")
@@ -51,5 +53,45 @@ class EventViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    func sendEventNotification(eventTitle: String) {
+        let db = Firestore.firestore()
+        db.collection("users").getDocuments { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    if let token = document.data()["fcmToken"] as? String {
+                        self.sendNotificationToDevice(token: token, title: "New Event", body: "Can You Attend This Gig/Practice?", eventTitle: eventTitle)
+                    }
+                }
+            }
+        }
+    }
+    
+    func sendNotificationToDevice(token: String, title: String, body: String, eventTitle: String) {
+        let urlString = "https://fcm.googleapis.com/fcm/send"
+        let url = NSURL(string: urlString)!
+        let paramString: [String : Any] = ["to" : token,
+                                           "notification" : ["title" : title, "body" : body],
+                                           "data" : ["event" : eventTitle]]
+        let request = NSMutableURLRequest(url: url as URL)
+        request.httpMethod = "POST"
+        request.httpBody = try? JSONSerialization.data(withJSONObject:paramString, options: [.prettyPrinted])
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("key=YOUR_SERVER_KEY", forHTTPHeaderField: "Authorization")
+        let task =  URLSession.shared.dataTask(with: request as URLRequest)  { (data, response, error) in
+            do {
+                if let jsonData = data {
+                    if let jsonDataDict  = try JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.allowFragments) as? [String: AnyObject] {
+                        NSLog("Received data:\n\(jsonDataDict))")
+                    }
+                }
+            } catch let err as NSError {
+                print(err.debugDescription)
+            }
+        }
+        task.resume()
     }
 }

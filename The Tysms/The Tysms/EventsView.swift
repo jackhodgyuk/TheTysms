@@ -25,13 +25,13 @@ struct EventsView: View {
     
     private var addButton: some View {
         Button(action: {
-            if authViewModel.isAdmin() {
+            if authViewModel.isAdminOrManager() {
                 showingAddEvent = true
             }
         }) {
             Image(systemName: "plus")
         }
-        .disabled(!authViewModel.isAdmin())
+        .disabled(!authViewModel.isAdminOrManager())
     }
 }
 

@@ -1,10 +1,13 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
 struct EventDetailView: View {
     @ObservedObject var eventViewModel: EventViewModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     let event: Event
     @State private var userResponse: String = ""
+    @State private var userNames: [String: String] = [:]
 
     var body: some View {
         ScrollView {
@@ -20,27 +23,40 @@ struct EventDetailView: View {
                 Text("Your Response:")
                     .font(.headline)
                 
-                Picker("Your Response", selection: $userResponse) {
-                    Text("Not Responded").tag("")
-                    Text("Going").tag("Going")
-                    Text("Not Going").tag("Not Going")
-                    Text("Maybe").tag("Maybe")
+                HStack {
+                    responseButton(response: "Yes", color: .green)
+                    responseButton(response: "Maybe", color: .yellow)
+                    responseButton(response: "No", color: .red)
                 }
-                .pickerStyle(SegmentedPickerStyle())
-                .onChange(of: userResponse) { newValue in
-                    updateResponse(newValue)
-                }
+                .padding(.vertical)
                 
-                Divider()
-                
-                Text("All Responses:")
-                    .font(.headline)
-                
-                ForEach(Array(event.responses), id: \.key) { userId, response in
+                if let userId = Auth.auth().currentUser?.uid, let response = event.responses[userId] {
+                    Divider()
+                    
+                    Text("Your Current Response:")
+                        .font(.headline)
+                    
                     HStack {
-                        Text(userId)
+                        Text(authViewModel.currentUser?.displayName ?? "You")
                         Spacer()
                         Text(response)
+                        responseIcon(for: response)
+                    }
+                }
+                
+                if authViewModel.isAdminOrManager() {
+                    Divider()
+                    
+                    Text("All Responses:")
+                        .font(.headline)
+                    
+                    ForEach(Array(event.responses), id: \.key) { userId, response in
+                        HStack {
+                            Text(userNames[userId] ?? "Loading...")
+                            Spacer()
+                            Text(response)
+                            responseIcon(for: response)
+                        }
                     }
                 }
             }
@@ -50,7 +66,42 @@ struct EventDetailView: View {
             if let userId = Auth.auth().currentUser?.uid {
                 userResponse = event.responses[userId] ?? ""
             }
+            if authViewModel.isAdminOrManager() {
+                fetchUserNames()
+            }
         }
+    }
+    
+    private func responseButton(response: String, color: Color) -> some View {
+        Button(action: {
+            updateResponse(response)
+        }) {
+            ZStack {
+                Circle()
+                    .fill(color)
+                    .frame(width: 60, height: 60)
+                Text(response)
+                    .foregroundColor(.white)
+                    .fontWeight(.bold)
+            }
+        }
+    }
+    
+    private func responseIcon(for response: String) -> some View {
+        let color: Color
+        switch response {
+        case "Yes":
+            color = .green
+        case "Maybe":
+            color = .yellow
+        case "No":
+            color = .red
+        default:
+            color = .gray
+        }
+        return Circle()
+            .fill(color)
+            .frame(width: 20, height: 20)
     }
     
     private func updateResponse(_ newResponse: String) {
@@ -60,8 +111,24 @@ struct EventDetailView: View {
             eventViewModel.updateEvent(updatedEvent) { success in
                 if success {
                     print("Response updated successfully")
+                    userResponse = newResponse
                 } else {
                     print("Failed to update response")
+                }
+            }
+        }
+    }
+    
+    private func fetchUserNames() {
+        let db = Firestore.firestore()
+        for userId in event.responses.keys {
+            db.collection("userRoles").document(userId).getDocument { (document, error) in
+                if let document = document, document.exists {
+                    if let name = document.data()?["name"] as? String {
+                        DispatchQueue.main.async {
+                            self.userNames[userId] = name
+                        }
+                    }
                 }
             }
         }
