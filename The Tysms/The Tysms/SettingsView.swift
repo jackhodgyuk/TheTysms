@@ -11,18 +11,38 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("Account")) {
-                    Button("Logout") {
-                        authViewModel.signOut()
-                    }
-                }
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.8), Color.blue.opacity(0.8)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .edgesIgnoringSafeArea(.all)
                 
-                Section(header: Text("Security")) {
-                    Button("Change Password") {
-                        showingChangePasswordAlert = true
+                VStack(spacing: 20) {
+                    settingsSection(title: "Account") {
+                        Button(action: {
+                            authViewModel.signOut()
+                        }) {
+                            Text("Logout")
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.white.opacity(0.7))
+                                .cornerRadius(10)
+                        }
+                    }
+                    
+                    settingsSection(title: "Security") {
+                        Button(action: {
+                            showingChangePasswordAlert = true
+                        }) {
+                            Text("Change Password")
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.white.opacity(0.7))
+                                .cornerRadius(10)
+                        }
                     }
                 }
+                .padding()
             }
             .navigationTitle("Settings")
             .alert("Change Password", isPresented: $showingChangePasswordAlert) {
@@ -45,6 +65,15 @@ struct SettingsView: View {
         }
     }
     
+    private func settingsSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.white)
+            content()
+        }
+    }
+    
     private func changePassword() {
         guard let user = Auth.auth().currentUser, let email = user.email else {
             resultMessage = "No user logged in"
@@ -52,7 +81,6 @@ struct SettingsView: View {
             return
         }
         
-        // First, reauthenticate the user
         let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
         user.reauthenticate(with: credential) { _, error in
             if let error = error {
@@ -61,7 +89,6 @@ struct SettingsView: View {
                 return
             }
             
-            // If reauthentication successful, update the password
             user.updatePassword(to: newPassword) { error in
                 if let error = error {
                     resultMessage = "Failed to change password: \(error.localizedDescription)"

@@ -19,9 +19,19 @@ struct FinanceListView: View {
             }
             .onDelete(perform: deleteFinance)
         }
-        .navigationBarItems(trailing: Button(action: { showingAddFinance = true }) {
-            Image(systemName: "plus")
-        })
+        .navigationBarItems(trailing:
+            Button(action: { showingAddFinance = true }) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 40, height: 40)
+                    
+                    Image(systemName: "plus")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 20, weight: .bold))
+                }
+            }
+        )
         .sheet(isPresented: $showingAddFinance) {
             AddFinanceView(viewModel: viewModel)
         }

@@ -7,22 +7,32 @@ struct FinancesView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                if authViewModel.isAdminOrManager() {
-                    Picker("", selection: $selectedTab) {
-                        Text("Finances").tag(0)
-                        Text("Purchase Requests").tag(1)
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.8), Color.blue.opacity(0.8)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .edgesIgnoringSafeArea(.all)
+                
+                VStack {
+                    if authViewModel.isAdminOrManager() {
+                        Picker("", selection: $selectedTab) {
+                            Text("Finances").tag(0)
+                            Text("Purchase Requests").tag(1)
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .padding()
+                        .background(Color.white.opacity(0.7))
+                        .cornerRadius(10)
+                        .padding(.horizontal)
                     }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding()
-
-                    if selectedTab == 0 {
-                        FinanceListView(viewModel: viewModel)
+                    
+                    if authViewModel.isAdminOrManager() {
+                        if selectedTab == 0 {
+                            FinanceListView(viewModel: viewModel)
+                        } else {
+                            FinanceRequestView(viewModel: viewModel)
+                        }
                     } else {
                         FinanceRequestView(viewModel: viewModel)
                     }
-                } else {
-                    FinanceRequestView(viewModel: viewModel)
                 }
             }
             .navigationTitle(authViewModel.isAdminOrManager() ? "Finances" : "Purchase Requests")

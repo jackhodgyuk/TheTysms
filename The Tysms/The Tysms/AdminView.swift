@@ -10,62 +10,68 @@ struct AdminView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(authViewModel.allUsers, id: \.email) { user in
-                    VStack(alignment: .leading) {
-                        Text(user.email)
-                            .font(.headline)
-                        Text("Role: \(user.role)")
-                            .font(.subheadline)
-                        Text("Name: \(user.name.isEmpty ? "Not set" : user.name)")
-                            .font(.subheadline)
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.8), Color.blue.opacity(0.8)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .edgesIgnoringSafeArea(.all)
+                
+                ScrollView {
+                    LazyVStack(spacing: 15) {
+                        ForEach(authViewModel.allUsers, id: \.email) { user in
+                            UserCard(user: user)
+                                .onTapGesture {
+                                    selectedUser = user
+                                    showingRoleActionSheet = true
+                                }
+                        }
                     }
-                    .onTapGesture {
-                        selectedUser = user
-                        showingRoleActionSheet = true
-                    }
-                    Button("Update Name") {
-                        showingUpdateNameView = true
-                        selectedUser = user
-                    }
-                    Button("Reset Password") {
-                        resetPassword(for: user)
-                    }
+                    .padding()
                 }
             }
             .navigationTitle("Admin Panel")
-            .navigationBarItems(trailing: Button(action: {
-                showingCreateUserView = true
-            }) {
-                Image(systemName: "plus")
-            })
-            .onAppear {
-                authViewModel.fetchAllUsers()
-            }
-            .actionSheet(isPresented: $showingRoleActionSheet) {
-                ActionSheet(title: Text("Change Role"), buttons: [
-                    .default(Text("Band Member")) { updateRole("bandmember") },
-                    .default(Text("Manager")) { updateRole("manager") },
-                    .default(Text("Admin")) { updateRole("admin") },
-                    .cancel()
-                ])
-            }
-            .sheet(isPresented: $showingUpdateNameView) {
-                if let user = selectedUser {
-                    UpdateUserNameView(userId: user.id, currentEmail: user.email)
-                }
-            }
-            .sheet(isPresented: $showingCreateUserView) {
-                CreateUserView(isPresented: $showingCreateUserView)
-            }
-            .alert(isPresented: $showingPasswordResetAlert) {
-                Alert(
-                    title: Text("Password Reset"),
-                    message: Text("Password reset email sent successfully."),
-                    dismissButton: .default(Text("OK"))
-                )
+            .navigationBarItems(trailing: addButton)
+            .onAppear { authViewModel.fetchAllUsers() }
+            .actionSheet(isPresented: $showingRoleActionSheet) { userActionSheet }
+            .sheet(isPresented: $showingUpdateNameView) { updateNameView }
+            .sheet(isPresented: $showingCreateUserView) { CreateUserView(isPresented: $showingCreateUserView) }
+            .alert(isPresented: $showingPasswordResetAlert) { passwordResetAlert }
+        }
+    }
+    
+    private var addButton: some View {
+        Button(action: { showingCreateUserView = true }) {
+            Image(systemName: "plus")
+                .foregroundColor(.white)
+                .padding(10)
+                .background(Color.blue)
+                .clipShape(Circle())
+        }
+    }
+    
+    private var userActionSheet: ActionSheet {
+        ActionSheet(title: Text("User Actions"), buttons: [
+            .default(Text("Change Role to Band Member")) { updateRole("bandmember") },
+            .default(Text("Change Role to Manager")) { updateRole("manager") },
+            .default(Text("Change Role to Admin")) { updateRole("admin") },
+            .default(Text("Update Name")) { showingUpdateNameView = true },
+            .default(Text("Reset Password")) { if let user = selectedUser { resetPassword(for: user) } },
+            .cancel()
+        ])
+    }
+    
+    private var updateNameView: some View {
+        Group {
+            if let user = selectedUser {
+                UpdateUserNameView(userId: user.id, currentEmail: user.email)
             }
         }
+    }
+    
+    private var passwordResetAlert: Alert {
+        Alert(
+            title: Text("Password Reset"),
+            message: Text("Password reset email sent successfully."),
+            dismissButton: .default(Text("OK"))
+        )
     }
     
     private func updateRole(_ newRole: String) {
@@ -80,6 +86,27 @@ struct AdminView: View {
     }
 }
 
+struct UserCard: View {
+    let user: AuthViewModel.User
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(user.email)
+                .font(.headline)
+                .foregroundColor(.white)
+            Text("Role: \(user.role)")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.8))
+            Text("Name: \(user.name.isEmpty ? "Not set" : user.name)")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.8))
+        }
+        .padding()
+        .background(Color.white.opacity(0.2))
+        .cornerRadius(10)
+    }
+}
+
 struct CreateUserView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @Binding var isPresented: Bool
@@ -91,23 +118,31 @@ struct CreateUserView: View {
 
     var body: some View {
         NavigationView {
-            Form {
-                TextField("Email", text: $email)
-                TextField("Name", text: $name)
-                Picker("Role", selection: $role) {
-                    Text("Band Member").tag("bandmember")
-                    Text("Manager").tag("manager")
-                    Text("Admin").tag("admin")
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.8), Color.blue.opacity(0.8)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .edgesIgnoringSafeArea(.all)
+                
+                VStack(spacing: 20) {
+                    TextField("Email", text: $email)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    TextField("Name", text: $name)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    Picker("Role", selection: $role) {
+                        Text("Band Member").tag("bandmember")
+                        Text("Manager").tag("manager")
+                        Text("Admin").tag("admin")
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
                 }
+                .padding()
+                .background(Color.white.opacity(0.2))
+                .cornerRadius(15)
+                .padding()
             }
             .navigationTitle("Create New User")
             .navigationBarItems(
-                leading: Button("Cancel") {
-                    isPresented = false
-                },
-                trailing: Button("Save") {
-                    createUser()
-                }
+                leading: Button("Cancel") { isPresented = false },
+                trailing: Button("Save") { createUser() }
             )
             .alert(isPresented: $showingAlert) {
                 Alert(title: Text("User Creation"), message: Text(alertMessage), dismissButton: .default(Text("OK")) {
