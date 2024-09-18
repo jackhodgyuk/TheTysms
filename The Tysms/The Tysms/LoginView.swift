@@ -60,7 +60,7 @@ struct LoginView: View {
             isAnimating = true
         }
         .alert(isPresented: $showingForgotPasswordAlert) {
-            Alert(
+             Alert(
                 title: Text("Forgot Password"),
                 message: Text("Contact Jack Hodgy to send your password reset link."),
                 dismissButton: .default(Text("OK"))
